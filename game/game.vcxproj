@@ -131,12 +131,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="collectible_list.h" />
+    <ClInclude Include="src\collectible.h" />
+    <ClInclude Include="src\collectible_list.h" />
     <ClInclude Include="src\example_layer.h" />
     <ClInclude Include="src\pickup.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="collectible_list.cpp" />
+    <ClCompile Include="src\collectible.cpp" />
+    <ClCompile Include="src\collectible_list.cpp" />
     <ClCompile Include="src\example_layer.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\pickup.cpp" />

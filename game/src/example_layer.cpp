@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "engine/events/key_event.h"
 #include "engine/utils/track.h"
-#include "pickup.h"
+#include "collectible.h"
 
 example_layer::example_layer() 
     :m_2d_camera(-1.6f, 1.6f, -0.9f, 0.9f), 
