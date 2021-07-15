@@ -1,6 +1,6 @@
 #pragma once
 #include <engine.h>
-class collectible;
+class health_pickup;
 
 class example_layer : public engine::layer
 {
@@ -21,6 +21,9 @@ private:
 	engine::ref<engine::game_object>	m_tree{};
 	engine::ref<engine::game_object>	m_ball{};
 	engine::ref<engine::game_object>	m_mannequin{};
+
+
+	engine::ref<health_pickup> m_health;
 
 
 	engine::ref<engine::material>		m_material{};

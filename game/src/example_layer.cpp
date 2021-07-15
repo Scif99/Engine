@@ -5,7 +5,10 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "engine/events/key_event.h"
 #include "engine/utils/track.h"
-#include "collectible.h"
+
+
+// Includes for collectibles
+#include "health_pickup.h"
 
 example_layer::example_layer() 
     :m_2d_camera(-1.6f, 1.6f, -0.9f, 0.9f), 
@@ -142,8 +145,8 @@ example_layer::example_layer()
 	pickup_props.position = { 5.f, 1.f, 5.f };
 	pickup_props.meshes = { pickup_shape->mesh() };
 	pickup_props.textures = { pickup_texture };
-	m_pickup = pickup::create(pickup_props);
-	m_pickup->init();
+	m_health = health_pickup::create(pickup_props);
+	m_health->init();
 
 	m_game_objects.push_back(m_terrain);
 	m_game_objects.push_back(m_ball);
@@ -163,7 +166,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 {
     m_3d_camera.on_update(time_step);
 	
-	m_pickup->update(m_3d_camera.position(), time_step);
+	m_health->update(m_3d_camera.position(), time_step);
 
 	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
 
@@ -227,14 +230,14 @@ void example_layer::on_render()
 	cow_transform = glm::scale(cow_transform, m_cow->scale());
 	engine::renderer::submit(textured_lighting_shader, cow_transform, m_cow);
 
-	m_pickup->textures().at(0)->bind();
+	m_health->textures().at(0)->bind();
 	glm::mat4 pickup_transform(1.0f);
-	pickup_transform = glm::translate(pickup_transform, m_pickup->position());
-	pickup_transform = glm::rotate(pickup_transform, m_pickup->rotation_amount(),
-	m_pickup -> rotation_axis());
-	if (m_pickup->active())
+	pickup_transform = glm::translate(pickup_transform, m_health->position());
+	pickup_transform = glm::rotate(pickup_transform, m_health->rotation_amount(),
+		m_health-> rotation_axis());
+	if (m_health->active())
 	{
-		engine::renderer::submit(textured_lighting_shader, m_pickup->meshes().at(0),
+		engine::renderer::submit(textured_lighting_shader, m_health->meshes().at(0),
 			pickup_transform);
 	}
 
@@ -268,9 +271,9 @@ void example_layer::on_render()
 	m_text_manager->render_text(text_shader,"Score: 0" , 10.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
 
 	// TODO: Make this text float up.. Probably want a score update() function
-	if (!m_pickup->active())
+	if (!m_health->active())
 	{
-		m_text_manager->render_text(text_shader, " +10 ", 65.f, (float)engine::application::window().height() - 55.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+		m_text_manager->render_text(text_shader, " +100 ", 65.f, (float)engine::application::window().height() - 55.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
 
 	}
 } 
