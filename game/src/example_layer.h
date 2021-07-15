@@ -1,6 +1,6 @@
 #pragma once
 #include <engine.h>
-class health_pickup;
+class pickup;
 
 class example_layer : public engine::layer
 {
@@ -22,15 +22,18 @@ private:
 	engine::ref<engine::game_object>	m_ball{};
 	engine::ref<engine::game_object>	m_mannequin{};
 
-
-	engine::ref<health_pickup> m_health;
+	// Collectibles
+	engine::ref<pickup> m_health;
+	engine::ref<pickup> m_random;
 
 
 	engine::ref<engine::material>		m_material{};
 
 	engine::DirectionalLight            m_directionalLight;
 
-	std::vector<engine::ref<engine::game_object>>     m_game_objects{};
+	// Containters for objects
+	std::vector<engine::ref<engine::game_object>>   m_game_objects{};
+	std::vector<engine::ref<pickup>>	m_collectibles{};
 
 	engine::ref<engine::bullet_manager> m_physics_manager{};
 	engine::ref<engine::audio_manager>  m_audio_manager{};

@@ -8,7 +8,7 @@
 
 
 // Includes for collectibles
-#include "health_pickup.h"
+#include "pickup.h"
 
 example_layer::example_layer() 
     :m_2d_camera(-1.6f, 1.6f, -0.9f, 0.9f), 
@@ -137,22 +137,44 @@ example_layer::example_layer()
 	sphere_props.mass = 0.000001f;
 	m_ball = engine::game_object::create(sphere_props);
 
+	// Collectibles
+
+	// Cuboid ptr for shared use by collectibles
+	engine::ref<engine::cuboid> cube_shape = engine::cuboid::create(glm::vec3(0.5f), false);
+
 	// Medkit texture from https://www.textures.com/download/manmadeboxes0007/105116
-	engine::ref<engine::cuboid> pickup_shape = engine::cuboid::create(glm::vec3(0.5f), false);
-	engine::ref<engine::texture_2d> pickup_texture =
+	engine::ref<engine::texture_2d> health_pickup_texture =
 								engine::texture_2d::create("assets/textures/medkit.jpg", true);
-	engine::game_object_properties pickup_props;
-	pickup_props.position = { 5.f, 1.f, 5.f };
-	pickup_props.meshes = { pickup_shape->mesh() };
-	pickup_props.textures = { pickup_texture };
-	m_health = health_pickup::create(pickup_props);
+	engine::game_object_properties health_pickup_props;
+	health_pickup_props.position = { 5.f, 1.f, 5.f };
+	health_pickup_props.meshes = { cube_shape->mesh() };
+	health_pickup_props.textures = { health_pickup_texture };
+	m_health = pickup::create(health_pickup_props);
 	m_health->init();
+
+
+	// Powerup texture from https://gamebanana.com/sprays/52947
+	engine::ref<engine::texture_2d> q_pickup_texture =
+		engine::texture_2d::create("assets/textures/question.jpg", true);
+	engine::game_object_properties q_pickup_props;
+	q_pickup_props.position = { 10.f, 1.f, 5.f };
+	q_pickup_props.meshes = { cube_shape->mesh() };
+	q_pickup_props.textures = { q_pickup_texture };
+	m_random = pickup::create(q_pickup_props);
+	m_random->init();
+
 
 	m_game_objects.push_back(m_terrain);
 	m_game_objects.push_back(m_ball);
 	//m_game_objects.push_back(m_cow);
 	//m_game_objects.push_back(m_tree);
 	//m_game_objects.push_back(m_pickup);
+
+
+	// Vector to store the in-game collectibles
+	m_collectibles.push_back(m_health);
+	m_collectibles.push_back(m_random);
+
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
 
 	m_text_manager = engine::text_manager::create();
@@ -165,8 +187,13 @@ example_layer::~example_layer() {}
 void example_layer::on_update(const engine::timestep& time_step) 
 {
     m_3d_camera.on_update(time_step);
-	
-	m_health->update(m_3d_camera.position(), time_step);
+
+	// Update all collectibles
+	for (auto pickup : m_collectibles)
+	{
+		pickup->update(m_3d_camera.position(), time_step);
+	}
+
 
 	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
 
@@ -200,23 +227,31 @@ void example_layer::on_render()
 
 	engine::renderer::submit(textured_lighting_shader, m_terrain);
 
-	glm::mat4 tree_transform(1.0f);
-	tree_transform = glm::translate(tree_transform, glm::vec3(4.f, 0.5, -5.0f));
-	tree_transform = glm::rotate(tree_transform, m_tree->rotation_amount(), m_tree->rotation_axis());
-	tree_transform = glm::scale(tree_transform, m_tree->scale());
-	engine::renderer::submit(textured_lighting_shader, tree_transform, m_tree);
+
+	// Render in trees on either side of entrance
+	std::stack<glm::mat4> tree_stack;
+	for (int i = 0;i < 5;++i)
+	{
+		// Left Side
+		tree_stack.push(glm::mat4(1.0f));
+		tree_stack.top() = glm::translate(tree_stack.top(), glm::vec3(float(i)*5.f, 0.5f, 10.f));
+		tree_stack.top() = glm::scale(tree_stack.top(), glm::vec3(0.2f));
+		engine::renderer::submit(textured_lighting_shader, tree_stack.top(), m_tree);
+		tree_stack.pop();
+
+		// Right side
+		tree_stack.push(glm::mat4(1.0f));
+		tree_stack.top() = glm::translate(tree_stack.top(), glm::vec3(float(i) * 5.f, 0.5f, 0.f));
+		tree_stack.top() = glm::scale(tree_stack.top(), glm::vec3(0.2f));
+		engine::renderer::submit(textured_lighting_shader, tree_stack.top(), m_tree);
+		tree_stack.pop();
+
+
+	}
 
 
 
 
-	//std::stack<glm::mat4> cow_stack;
-	//for (int i = 0;i < 5;++i)
-	//{
-	//	cow_stack.push(glm::mat4(1.0f));
-	//	cow_stack.top() = glm::translate(cow_stack.top(), glm::vec3(0.f, 1.f, 10.f));
-	//	engine::renderer::submit(textured_lighting_shader, cow_stack.top(), m_cow);
-	//	cow_stack.pop();
-	//}
 	
 
 	glm::vec3 p = glm::vec3(0.f, 0.5f, 5.f);
@@ -239,6 +274,18 @@ void example_layer::on_render()
 	{
 		engine::renderer::submit(textured_lighting_shader, m_health->meshes().at(0),
 			pickup_transform);
+	}
+
+	m_random->textures().at(0)->bind();
+	glm::mat4 q_pickup_transform(1.0f);
+	q_pickup_transform = glm::translate(q_pickup_transform, m_random->position());
+	q_pickup_transform = glm::rotate(q_pickup_transform, m_random->rotation_amount(),
+		m_random->rotation_axis());
+	q_pickup_transform = glm::scale(q_pickup_transform, glm::vec3(0.5f));
+	if (m_random->active())
+	{
+		engine::renderer::submit(textured_lighting_shader, m_random->meshes().at(0),
+			q_pickup_transform);
 	}
 
 
