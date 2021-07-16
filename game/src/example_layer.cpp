@@ -184,6 +184,8 @@ example_layer::example_layer()
 
 example_layer::~example_layer() {}
 
+
+// Update various components
 void example_layer::on_update(const engine::timestep& time_step) 
 {
     m_3d_camera.on_update(time_step);
@@ -234,14 +236,14 @@ void example_layer::on_render()
 	{
 		// Left Side
 		tree_stack.push(glm::mat4(1.0f));
-		tree_stack.top() = glm::translate(tree_stack.top(), glm::vec3(float(i)*5.f, 0.5f, 10.f));
+		tree_stack.top() = glm::translate(tree_stack.top(), glm::vec3(-5.f, 0.5f, -float(i)*5.f));
 		tree_stack.top() = glm::scale(tree_stack.top(), glm::vec3(0.2f));
 		engine::renderer::submit(textured_lighting_shader, tree_stack.top(), m_tree);
 		tree_stack.pop();
 
 		// Right side
 		tree_stack.push(glm::mat4(1.0f));
-		tree_stack.top() = glm::translate(tree_stack.top(), glm::vec3(float(i) * 5.f, 0.5f, 0.f));
+		tree_stack.top() = glm::translate(tree_stack.top(), glm::vec3(5.f, 0.5f, -float(i) * 5.f));
 		tree_stack.top() = glm::scale(tree_stack.top(), glm::vec3(0.2f));
 		engine::renderer::submit(textured_lighting_shader, tree_stack.top(), m_tree);
 		tree_stack.pop();
@@ -315,6 +317,7 @@ void example_layer::on_render()
 	// Render text
 	const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
 
+
 	m_text_manager->render_text(text_shader,"Score: 0" , 10.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
 
 	// TODO: Make this text float up.. Probably want a score update() function
@@ -334,6 +337,7 @@ void example_layer::on_event(engine::event& event)
         { 
             engine::render_command::toggle_wireframe();
         }
+
     } 
 }
 
@@ -343,3 +347,4 @@ void example_layer::check_bounce()
 		//m_audio_manager->play("bounce");
 	m_prev_sphere_y_vel = m_game_objects.at(1)->velocity().y;
 }
+

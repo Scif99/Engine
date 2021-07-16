@@ -21,6 +21,7 @@ void pickup::update(glm::vec3 c, float dt)
 	{
 		// Play some events..
 		m_is_active = false;
+		
 	}
 
 }

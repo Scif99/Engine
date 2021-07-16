@@ -1,5 +1,7 @@
 #pragma once
 #include "renderer_api.h"
+#include <engine/renderer/text_manager.h>
+
 
 namespace engine
 {
@@ -37,6 +39,8 @@ namespace engine
 
             is_wireframe = !is_wireframe;
         }
+
+
 
         static void primitive_type(const e_primitive_type& type)
         {

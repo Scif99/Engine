@@ -69,7 +69,7 @@ engine::perspective_camera::perspective_camera(
     m_near_plane(near_z), 
     m_far_plane(far_z) 
 { 
-    m_position = glm::vec3(0.0f, 1.0f, 3.0f);  
+    m_position = glm::vec3(0.0f, 2.0f, 5.0f);  
     m_front_vector = glm::vec3(0.0f, 0.0f, -1.0f);
     m_up_vector = glm::vec3(0.0f, 1.0f,  0.0f);
     m_view_mat = glm::lookAt(m_position, m_position + m_front_vector, m_up_vector);
@@ -91,7 +91,7 @@ engine::perspective_camera::perspective_camera(
 void engine::perspective_camera::on_update(const timestep& timestep)
 {
 	auto [mouse_delta_x, mouse_delta_y] = input::mouse_position();
-	process_mouse(mouse_delta_x, mouse_delta_y);
+	process_mouse(mouse_delta_x, mouse_delta_y); // Adjust pitch and yaw
 
 	update_camera_vectors();
 
@@ -145,7 +145,7 @@ void engine::perspective_camera::process_mouse(float mouse_delta_x, float mouse_
 }
 
 void engine::perspective_camera::move(e_direction direction, timestep ts) 
-{ 
+{
     if(direction == forward) 
         m_position += s_movement_speed * ts * m_front_vector; 
     else if(direction == backward) 
@@ -155,6 +155,12 @@ void engine::perspective_camera::move(e_direction direction, timestep ts)
         m_position -= s_movement_speed * ts * m_right_vector;
     else if(direction == right) 
         m_position += s_movement_speed * ts * m_right_vector;
+
+    // Prevent camera from clipping under floor
+    if (m_position.y < 1.f)
+    {
+        m_position.y = 1.f;
+    }
 
     //LOG_CORE_TRACE("3d cam position: [{},{},{}]", m_position.x, m_position.y, m_position.z); 
 } 
@@ -204,7 +210,7 @@ void engine::perspective_camera::update_view_matrix()
 
     // inverting the transform matrix  
     //m_view_mat = glm::inverse(transform); 
-    m_view_mat = glm::lookAt(m_position, m_position + m_front_vector, m_up_vector);
+    m_view_mat = glm::lookAt(m_position, m_position + m_front_vector, m_up_vector); // Pass updated camera vectors
     m_view_projection_mat = m_projection_mat * m_view_mat; 
 }
 
