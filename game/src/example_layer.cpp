@@ -9,6 +9,8 @@
 
 // Includes for collectibles
 #include "pickup.h"
+#include "player.h"
+
 
 example_layer::example_layer() 
     :m_2d_camera(-1.6f, 1.6f, -0.9f, 0.9f), 
@@ -92,6 +94,8 @@ example_layer::example_layer()
 	mannequin_props.type = 0;
 	mannequin_props.bounding_shape = m_skinned_mesh->size() / 2.f * mannequin_props.scale.x;
 	m_mannequin = engine::game_object::create(mannequin_props);
+		
+	m_player.initialise(m_mannequin);
 
 	// Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
 	std::vector<engine::ref<engine::texture_2d>> terrain_textures = { engine::texture_2d::create("assets/textures/terrain.bmp", false) };
@@ -186,9 +190,11 @@ example_layer::~example_layer() {}
 
 
 // Update various components
-void example_layer::on_update(const engine::timestep& time_step) 
+void example_layer::on_update(const engine::timestep& time_step)
 {
-    m_3d_camera.on_update(time_step);
+
+	// Enum for camera
+    //m_3d_camera.on_update(time_step);
 
 	// Update all collectibles
 	for (auto pickup : m_collectibles)
@@ -198,11 +204,11 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 
 	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
-
-	m_mannequin->animated_mesh()->on_update(time_step);
+	m_player.on_update(time_step);
+	m_player.update_camera(m_3d_camera);
 
 	check_bounce();
-} 
+}
 
 void example_layer::on_render() 
 {
