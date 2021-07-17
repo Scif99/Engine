@@ -17,21 +17,32 @@ void player::initialise(engine::ref<engine::game_object> object)
 	m_object->set_position(glm::vec3(0.f, 0.5, 10.f));
 	m_object->animated_mesh()->set_default_animation(1);
 }
-void player::on_update(const engine::timestep& time_step)
+void player::on_update(const engine::timestep& timestep)
 {
 	m_object->set_position(m_object->position() += m_object->forward() * m_speed *
-		(float)time_step);
+		(float)timestep);
 
-	m_object->set_rotation_amount(atan2(m_object->forward().x,m_object->forward().z)); // Note the rotation is clockwise
+	m_object->set_rotation_amount(atan2(m_object->forward().x,m_object->forward().z)); // Rotate model towards direction
 
-	if (engine::input::key_pressed(engine::key_codes::KEY_A)) // left
-		turn(3.0f * time_step);
-
-	if (engine::input::key_pressed(engine::key_codes::KEY_D)) // left
-		turn(-3.0f * time_step);
+	m_object->animated_mesh()->on_update(timestep); //Moved from example_layer::on_update
 
 
-	m_object->animated_mesh()->on_update(time_step); //Moved from example_layer::on_update
+
+	if (engine::input::key_pressed(engine::key_codes::KEY_W))
+	{
+		m_speed = 1.f;
+	}
+
+	if (engine::input::key_pressed(engine::key_codes::KEY_S))
+	{
+		m_speed = 0.f;
+	}
+
+	if (engine::input::key_pressed(engine::key_codes::KEY_1)) // left
+		turn(1.0f * timestep);
+
+
+
 
 }
 
@@ -48,7 +59,9 @@ void player::update_camera(engine::perspective_camera& camera)
 	camera.set_view_matrix(cam_pos, look_at);
 }
 
+//void player::move(e_direction direction, engine::timestep ts) {}
 void player::turn(float angle)
 {
 	m_object->set_forward(glm::rotate(m_object->forward(), angle, glm::vec3(0.f, 1.f, 0.f))); // Rotate forward vector about y axis
 }
+

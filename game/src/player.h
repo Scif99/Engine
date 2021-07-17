@@ -3,6 +3,7 @@
 #include "glm/gtx/rotate_vector.hpp"
 
 
+
 class player
 {
 
@@ -12,6 +13,7 @@ public:
 	void initialise(engine::ref<engine::game_object> object);
 	void on_update(const engine::timestep& time_step);
 	engine::ref<engine::game_object> object() const { return m_object; }
+	//void player::move( e_direction direction, engine::timestep ts);
 	void turn(float angle);
 	void update_camera(engine::perspective_camera& camera);
 	void jump();
