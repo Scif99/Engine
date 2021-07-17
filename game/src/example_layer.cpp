@@ -255,7 +255,7 @@ void example_layer::on_render()
 
 
 	
-
+	// Anglae between cow and camera
 	glm::vec3 p = glm::vec3(0.f, 0.5f, 5.f);
 	glm::vec3 v = m_3d_camera.position() - p;
 	//Note atan2 works for all quadrants

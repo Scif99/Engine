@@ -95,6 +95,8 @@ void engine::perspective_camera::on_update(const timestep& timestep)
 
 	update_camera_vectors();
 
+    //float y_value = m_position.y;
+
     if(input::key_pressed(engine::key_codes::KEY_A)) // left
         move(e_direction::left, timestep);
     else if(input::key_pressed(engine::key_codes::KEY_D)) // right
@@ -104,6 +106,8 @@ void engine::perspective_camera::on_update(const timestep& timestep)
         move(e_direction::backward, timestep);
     else if(engine::input::key_pressed(engine::key_codes::KEY_W)) // up
         move(e_direction::forward, timestep);
+
+    //m_position.y = y_value;
 
     //float delta = input::mouse_scroll();
     //process_mouse_scroll(delta);
@@ -156,11 +160,7 @@ void engine::perspective_camera::move(e_direction direction, timestep ts)
     else if(direction == right) 
         m_position += s_movement_speed * ts * m_right_vector;
 
-    // Prevent camera from clipping under floor
-    if (m_position.y < 1.f)
-    {
-        m_position.y = 1.f;
-    }
+
 
     //LOG_CORE_TRACE("3d cam position: [{},{},{}]", m_position.x, m_position.y, m_position.z); 
 } 
@@ -211,6 +211,8 @@ void engine::perspective_camera::update_view_matrix()
     // inverting the transform matrix  
     //m_view_mat = glm::inverse(transform); 
     m_view_mat = glm::lookAt(m_position, m_position + m_front_vector, m_up_vector); // Pass updated camera vectors
+  
+    // m_view_mat = glm::lookAt(glm::vec3(0.f,20.f,0.f),glm::vec3(0.f,0.f,0.f) , glm::vec3(1.f,0.f,0.f)); // Top-Down view
     m_view_projection_mat = m_projection_mat * m_view_mat; 
 }
 
