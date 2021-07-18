@@ -331,6 +331,7 @@ void example_layer::on_render()
 	int score = 0;
 	std::string s = std::to_string(score);
 	m_text_manager->render_text(text_shader,"Score: " + s , 10.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+	m_text_manager->render_text(text_shader, "Health: 100 " , (float)engine::application::window().width() - 130.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.f, 0.f, 1.f));
 
 	// TODO: Make this text float up.. Probably want a score update() function
 	if (!m_health->active())

@@ -36,6 +36,16 @@ void player::on_update(const engine::timestep& timestep)
 
 	}
 
+	// Sprint?
+	if (engine::input::key_pressed(engine::key_codes::KEY_LEFT_SHIFT) && m_speed>0)
+	{
+		m_timer = m_object->animated_mesh()->animations().at(3)->mDuration;
+		m_speed = 5.f;
+		m_object->animated_mesh()->switch_animation(4);
+
+	}
+
+
 	if (engine::input::key_pressed(engine::key_codes::KEY_S))
 	{
 		m_speed = 0.f;
