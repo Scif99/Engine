@@ -48,4 +48,6 @@ private:
 
     engine::orthographic_camera       m_2d_camera; 
     engine::perspective_camera        m_3d_camera;
+	//Variable to track game score
+	int m_score{ 0 };
 };

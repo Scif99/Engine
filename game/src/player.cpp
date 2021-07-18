@@ -62,6 +62,7 @@ void player::on_update(const engine::timestep& timestep)
 	{
 		m_speed = 0.f;
 		m_object->animated_mesh()->switch_animation(2);
+		sprint = false;
 	}
 
 	if (engine::input::key_pressed(engine::key_codes::KEY_A)) // left

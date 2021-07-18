@@ -201,6 +201,12 @@ void example_layer::on_update(const engine::timestep& time_step)
 		pickup->update(m_mannequin->position(), time_step); // Use the position of the manneqeuin to determine activity, rather than position of camera
 	}
 
+	// TO-FIX!
+	if (!m_health->active())
+	{
+		m_player.set_health(m_player.health() + 50);
+	}
+
 
 	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
 
@@ -331,19 +337,11 @@ void example_layer::on_render()
 	// Turn this next bit into a class!
 
 	// Score?
-	int score = 0;
-	std::string s = std::to_string(score);
-	m_text_manager->render_text(text_shader,"Score: " + s , 10.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
-	m_text_manager->render_text(text_shader, "Health: 100 " , (float)engine::application::window().width() - 130.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.f, 0.f, 1.f));
+
+	m_text_manager->render_text(text_shader,"Score: " + std::to_string(m_score) , 10.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+	m_text_manager->render_text(text_shader, "Health:  " + std::to_string(m_player.health()) , (float)engine::application::window().width() - 130.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.f, 0.f, 1.f));
 
 
-	// TODO: Make this text float up.. Probably want a score update() function
-	if (!m_health->active())
-	{
-		score += 100;
-		m_text_manager->render_text(text_shader, " +100 ", 65.f, (float)engine::application::window().height() - 55.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
-		
-	}
 
 	// Display whether player is sprinting
 	m_text_manager->render_text(text_shader, "Sprint: " + m_player.sprint_notif(), (float)engine::application::window().width() - 130.f, 25.f, 0.5f, glm::vec4(1.f, 0.f, 0.f, 1.f));
