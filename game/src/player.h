@@ -18,11 +18,14 @@ public:
 	void jump();
 	bool is_fps() { return fps; }
 	void toggle_fps() { fps =  !fps; } //Toggle fps camera
+	bool sprint = false;
+	std::string sprint_notif() { return (sprint) ? "On" : "Off"; } // Part of the HUD
 
 
 private:
 	float m_speed{ 0.f };
 	float m_timer;
 	bool fps = true; // Boolean to determins whether camera is in fps mode
+	// Pops up to see whether you are in sprint mode
 	engine::ref< engine::game_object> m_object;
 };

@@ -31,18 +31,30 @@ void player::on_update(const engine::timestep& timestep)
 	 // Proccess movement
 	if (engine::input::key_pressed(engine::key_codes::KEY_W))
 	{
-		m_speed = 3.f;
-		m_object->animated_mesh()->switch_animation(1);
+		if (sprint)
+		{
+			m_speed = 5.f;
+			m_object->animated_mesh()->switch_animation(4);
+		}
+
+		else
+		{
+			m_speed = 3.f;
+			m_object->animated_mesh()->switch_animation(1);
+		}
 
 	}
 
 	// Sprint?
-	if (engine::input::key_pressed(engine::key_codes::KEY_LEFT_SHIFT) && m_speed>0)
+	if (engine::input::key_pressed(engine::key_codes::KEY_LEFT_SHIFT))
 	{
-		m_timer = m_object->animated_mesh()->animations().at(3)->mDuration;
-		m_speed = 5.f;
-		m_object->animated_mesh()->switch_animation(4);
-
+		if (!sprint) { sprint = true; }
+		else if (m_speed>0) // If already moving
+		{
+			sprint = false;
+			m_speed = 3.f;
+			m_object->animated_mesh()->switch_animation(1);
+		}
 	}
 
 
@@ -67,8 +79,12 @@ void player::on_update(const engine::timestep& timestep)
 		if (m_timer < 0.f)
 		{
 			m_object->animated_mesh()->switch_root_movement(false);
-			m_object->animated_mesh()->switch_animation(m_object->animated_mesh() -> default_animation());
-			m_speed = 0.f;
+			if (sprint)
+			{
+				m_object->animated_mesh()->switch_animation(1); // If sprint finished, revert back to regular run
+				sprint = false;
+			}
+			m_speed = (sprint) ? 3.f : 0.f; // If sprinting, revert back to running
 		}
 	}
 }
