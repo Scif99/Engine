@@ -15,61 +15,54 @@ void player::initialise(engine::ref<engine::game_object> object)
 	m_object = object;
 	m_object->set_forward(glm::vec3(0.f, 0.f, -1.f));
 	m_object->set_position(glm::vec3(0.f, 0.5, 10.f));
-	m_object->animated_mesh()->set_default_animation(2);
+	m_object->animated_mesh()->set_default_animation(1);
 	// Starting animation?
 }
 void player::on_update(const engine::timestep& timestep)
 {
-	m_object->set_position(m_object->position() += m_object->forward() * m_speed *
-		(float)timestep);
+	//m_object->set_position(m_object->position() += m_object->forward() * m_speed *
+		//(float)timestep);
 
 	m_object->set_rotation_amount(atan2(m_object->forward().x,m_object->forward().z)); // Rotate model towards direction
 
 	m_object->animated_mesh()->on_update(timestep); //Moved from example_layer::on_update
 
 
-	 // Proccess movement
+	 // Process movement
 	if (engine::input::key_pressed(engine::key_codes::KEY_W))
 	{
-		if (sprint)
+		// Sprint
+		if (engine::input::key_pressed(engine::key_codes::KEY_LEFT_SHIFT))
 		{
-			m_speed = 5.f;
+			float sprint_speed = 6.f;
+			m_object->set_position(m_object->position() + sprint_speed * timestep * m_object->forward());
 			m_object->animated_mesh()->switch_animation(4);
+
 		}
 
+		// Regular movement
 		else
 		{
 			m_speed = 3.f;
+			m_object->set_position(m_object->position() + m_speed * timestep * m_object->forward());
 			m_object->animated_mesh()->switch_animation(1);
 		}
 
-	}
-
-	// Sprint?
-	if (engine::input::key_pressed(engine::key_codes::KEY_LEFT_SHIFT))
-	{
-		if (!sprint) { sprint = true; }
-		else if (m_speed>0) // If already moving
-		{
-			sprint = false;
-			m_speed = 3.f;
-			m_object->animated_mesh()->switch_animation(1);
-		}
 	}
 
 
 	if (engine::input::key_pressed(engine::key_codes::KEY_S))
 	{
-		m_speed = 0.f;
-		m_object->animated_mesh()->switch_animation(2);
-		sprint = false;
+		float move_speed = 3.f;
+		m_object->set_position(m_object->position()  - move_speed * timestep * m_object->forward());
+		m_object->animated_mesh()->switch_animation(1);
 	}
 
-	if (engine::input::key_pressed(engine::key_codes::KEY_A)) // left
-		turn(1.0f * timestep);
+	if (engine::input::key_pressed(engine::key_codes::KEY_A))
+		strafe_left(timestep);
 
-	if (engine::input::key_pressed(engine::key_codes::KEY_D)) // Right
-		turn(-1.0f * timestep);
+	if (engine::input::key_pressed(engine::key_codes::KEY_D)) 
+		strafe_right(timestep);
 
 	if (engine::input::key_pressed(engine::key_codes::KEY_SPACE))
 		jump();
@@ -80,13 +73,20 @@ void player::on_update(const engine::timestep& timestep)
 		if (m_timer < 0.f)
 		{
 			m_object->animated_mesh()->switch_root_movement(false);
-			if (sprint)
+
+			if (m_speed > 0)
 			{
-				m_object->animated_mesh()->switch_animation(1); // If sprint finished, revert back to regular run
-				sprint = false;
+				m_object->animated_mesh()->switch_animation(1);
 			}
-			m_speed = (sprint) ? 3.f : 0.f; // If sprinting, revert back to running
+			else { m_object->animated_mesh()->switch_animation(2); }
 		}
+	}
+
+	// Otherwise, if stationary
+	else
+	{
+		m_speed = 0.f;
+		//m_object->animated_mesh()->switch_animation(2);
 	}
 }
 
@@ -105,15 +105,22 @@ void player::update_camera(engine::perspective_camera& camera)
 
 
 
-
-
-
 void player::turn(float angle)
 {
 	m_object->set_forward(glm::rotate(m_object->forward(), angle, glm::vec3(0.f, 1.f, 0.f))); // Rotate forward vector about y axis
 }
 
+void player::strafe_right(engine::timestep ts)
+{
+	glm::vec3 m_right_vector = glm::normalize(glm::cross(m_object->forward(), glm::vec3(0.f,1.f,0.f)) );
+	m_object->set_position(m_object->position() + 3.f * ts * m_right_vector);
+}
 
+void player::strafe_left(engine::timestep ts)
+{
+	glm::vec3 m_left_vector =  - glm::normalize(glm::cross(m_object->forward(), glm::vec3(0.f, 1.f, 0.f)));
+	m_object->set_position(m_object->position() + 3.f * ts * m_left_vector);
+}
 
 void player::jump()
 {

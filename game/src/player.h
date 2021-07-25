@@ -13,7 +13,9 @@ public:
 	void initialise(engine::ref<engine::game_object> object);
 	void on_update(const engine::timestep& time_step);
 	engine::ref<engine::game_object> object() const { return m_object; }
-	void move();
+	void player::strafe_right(engine::timestep ts);
+	void player::strafe_left(engine::timestep ts);
+
 	void turn(float angle);
 	void update_camera(engine::perspective_camera& camera);
 	void jump();

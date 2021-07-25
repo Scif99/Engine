@@ -360,10 +360,15 @@ void example_layer::on_render()
 	m_text_manager->render_text(text_shader,"Score: " + std::to_string(m_score) , 10.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
 	m_text_manager->render_text(text_shader, "Health:  " + std::to_string(m_player.health()) , (float)engine::application::window().width() - 130.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.f, 0.f, 1.f));
 
+	//Render crosshairs?
 
+	std::pair<float, float> centre = std::make_pair( ((float)engine::application::window().width() - engine::application::window().width() / 2.f),
+													((float)engine::application::window().height() - (float)engine::application::window().height() / 2.f) ); // The centre of the window
+	m_text_manager->render_text(text_shader, "|" , centre.first +1.f, centre.second +15.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f)); //Top
+	m_text_manager->render_text(text_shader, "|", centre.first +1.f, centre.second -15.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f));
+	m_text_manager->render_text(text_shader, "_", centre.first -14.f , centre.second  +3.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f));
+	m_text_manager->render_text(text_shader, "_", centre.first +14.f, centre.second +3.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
-	// Display whether player is sprinting
-	m_text_manager->render_text(text_shader, "Sprint: " + m_player.sprint_notif(), (float)engine::application::window().width() - 130.f, 25.f, 0.5f, glm::vec4(1.f, 0.f, 0.f, 1.f));
 
 } 
 
