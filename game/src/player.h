@@ -15,8 +15,8 @@ public:
 	engine::ref<engine::game_object> object() const { return m_object; }
 	void player::strafe_right(engine::timestep ts);
 	void player::strafe_left(engine::timestep ts);
-
-	void turn(float angle);
+	void player::process_mouse(float delta_x, float delta_y);
+	void player::turn(float angle_x, float angle_y);
 	void update_camera(engine::perspective_camera& camera);
 	void jump();
 	bool is_fps() { return fps; }
@@ -31,6 +31,6 @@ private:
 	float m_timer;
 	bool fps = true; // Boolean to determins whether camera is in fps mode
 	int m_health = 100;
-	// Pops up to see whether you are in sprint mode
+
 	engine::ref< engine::game_object> m_object;
 };

@@ -20,6 +20,14 @@ void player::initialise(engine::ref<engine::game_object> object)
 }
 void player::on_update(const engine::timestep& timestep)
 {
+	// Processing mouse movement
+	auto [mouse_delta_x, mouse_delta_y] = engine::input::mouse_position();
+
+	process_mouse(mouse_delta_x, mouse_delta_y);
+		
+
+
+
 	//m_object->set_position(m_object->position() += m_object->forward() * m_speed *
 		//(float)timestep);
 
@@ -82,6 +90,13 @@ void player::on_update(const engine::timestep& timestep)
 		}
 	}
 
+	// NED TO FIX
+	if (m_object->position().y != 0.5f)
+	{
+		// Stop character from flying lol
+		m_object->set_position(glm::vec3(m_object->position().x, 0.5f, m_object->position().z));
+	}
+
 	// Otherwise, if stationary
 	else
 	{
@@ -105,9 +120,29 @@ void player::update_camera(engine::perspective_camera& camera)
 
 
 
-void player::turn(float angle)
+void player::turn(float angle_x, float angle_y)
 {
-	m_object->set_forward(glm::rotate(m_object->forward(), angle, glm::vec3(0.f, 1.f, 0.f))); // Rotate forward vector about y axis
+	m_object->set_forward(glm::rotate(m_object->forward(),  - angle_x, glm::vec3(0.f, 1.f, 0.f))); // left-right rotation. Note the negative sign is to prevent inverted controls
+
+	glm::vec3 m_right_vector = glm::normalize(glm::cross(m_object->forward(), glm::vec3(0.f, 1.f, 0.f)));
+	m_object->set_forward(glm::rotate(m_object->forward(), angle_y, m_right_vector)); // up-down rotation
+
+
+
+}
+
+
+void player::process_mouse(float delta_x, float delta_y)
+{
+	// Sensitivity of the mouse
+	//float sensitivity = 0.003f;
+	float sensitivity = 0.003f;
+	delta_x *= sensitivity;
+	delta_y *= sensitivity;
+
+	turn(delta_x, delta_y);
+
+
 }
 
 void player::strafe_right(engine::timestep ts)
