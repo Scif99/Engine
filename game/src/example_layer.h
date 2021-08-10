@@ -33,10 +33,15 @@ private:
 	engine::ref<pickup> m_health;
 	engine::ref<pickup> m_random;
 
-
+	
 	engine::ref<engine::material>		m_material{};
 
+
+
+	// Light Sources
 	engine::DirectionalLight            m_directionalLight;
+
+
 
 	// Containters for objects
 	std::vector<engine::ref<engine::game_object>>   m_game_objects{};

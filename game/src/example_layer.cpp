@@ -37,10 +37,14 @@ example_layer::example_layer()
 	auto text_shader = engine::renderer::shaders_library()->get("text_2D");
 	auto animated_mesh_shader = engine::renderer::shaders_library()->get("animated_mesh");
 
+	// Set properties of directional light variable
 	m_directionalLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_directionalLight.AmbientIntensity = 0.25f;
 	m_directionalLight.DiffuseIntensity = 0.6f;
 	m_directionalLight.Direction = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
+
+	// Point light?
+
 
 	// set color texture unit
 	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->bind();
@@ -71,6 +75,7 @@ example_layer::example_layer()
 	// Set properties of materials
 	m_material = engine::material::create(1.0f, glm::vec3(1.0f, 0.1f, 0.07f),
 		glm::vec3(1.0f, 0.1f, 0.07f), glm::vec3(0.5f, 0.5f, 0.5f), 1.0f);
+
 
 
 	// Skybox texture from http://www.vwall.it/wp-content/plugins/canvasio3dpro/inc/resource/cubeMaps/
@@ -283,10 +288,6 @@ void example_layer::on_render()
 
 	}
 
-
-
-
-	
 	// Anglae between cow and camera
 	glm::vec3 p = glm::vec3(0.f, 0.5f, 5.f);
 	glm::vec3 v = m_mannequin->position() - p;
@@ -342,6 +343,7 @@ void example_layer::on_render()
 
 	// Render the sphere using material shader
 	engine::renderer::submit(material_shader, m_ball);
+
 
 	engine::renderer::end_scene();
 
