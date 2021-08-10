@@ -50,11 +50,13 @@ example_layer::example_layer()
 	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("gMatSpecularIntensity", 0.5f);
 	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("gSpecularPower", 5.f);
 	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("transparency", 1.0f);
+
 	std::dynamic_pointer_cast<engine::gl_shader>(mesh__material_shader)->bind();
 	std::dynamic_pointer_cast<engine::gl_shader>(mesh__material_shader)->set_uniform("lighting_on", true);
 	m_directionalLight.submit(mesh__material_shader);
 	std::dynamic_pointer_cast<engine::gl_shader>(mesh__material_shader)->set_uniform("gMatSpecularIntensity", 1.f);
-	std::dynamic_pointer_cast<engine::gl_shader>(mesh__material_shader)->set_uniform("gSpecularPower", 10.f);
+	std::dynamic_pointer_cast<engine::gl_shader>(mesh__material_shader)->set_uniform("gSpecularPower", 10.f); // Sets specular power (higher mean sharper)
+
 	std::dynamic_pointer_cast<engine::gl_shader>(mesh_lighting_shader)->bind();
 	std::dynamic_pointer_cast<engine::gl_shader>(mesh_lighting_shader)->set_uniform("gColorMap", 0);
 	std::dynamic_pointer_cast<engine::gl_shader>(mesh_lighting_shader)->set_uniform("lighting_on", true);
@@ -66,6 +68,7 @@ example_layer::example_layer()
 	std::dynamic_pointer_cast<engine::gl_shader>(text_shader)->set_uniform("projection",
 		glm::ortho(0.f, (float)engine::application::window().width(), 0.f,
 		(float)engine::application::window().height()));
+	// Set properties of materials
 	m_material = engine::material::create(1.0f, glm::vec3(1.0f, 0.1f, 0.07f),
 		glm::vec3(1.0f, 0.1f, 0.07f), glm::vec3(0.5f, 0.5f, 0.5f), 1.0f);
 
@@ -143,6 +146,7 @@ example_layer::example_layer()
 	tree_props.scale = glm::vec3(tree_scale);
 	m_tree = engine::game_object::create(tree_props);
 
+	//  Set properties of sphere
 	engine::ref<engine::sphere> sphere_shape = engine::sphere::create(10, 20, 0.5f);
 	engine::game_object_properties sphere_props;
 	sphere_props.position = { 0.f, 5.f, -5.f };
@@ -244,7 +248,7 @@ void example_layer::on_render()
 	engine::renderer::begin_scene(m_3d_camera, textured_lighting_shader);
 
 	// Set up some of the scene's parameters in the shader
-	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position());
+	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position()); // Use camera position as light source
 
 	// Position the skybox centred on the player and render it
 	glm::mat4 skybox_tranform(1.0f);
@@ -332,9 +336,11 @@ void example_layer::on_render()
 	const auto material_shader = engine::renderer::shaders_library()->get("mesh_material");
 	engine::renderer::begin_scene(m_3d_camera, material_shader);
 
+	
 	m_material->submit(material_shader);
-	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position());
+	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position()); // 
 
+	// Render the sphere using material shader
 	engine::renderer::submit(material_shader, m_ball);
 
 	engine::renderer::end_scene();
