@@ -1,0 +1,35 @@
+# Blender MTL File: 'basilisk-crossbow.blend'
+# Material Count: 3
+
+newmtl Gun_Barrel_Iron
+Ns 125.490196
+Ka 0.059574 0.058089 0.058089
+Kd 0.224000 0.224000 0.224000
+Ks 0.636200 0.495239 0.664392
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 5
+map_Kd C:\Users\Soleh\Downloads\vwep\basilisk.png
+
+newmtl Polished_wood
+Ns 37.254902
+Ka 1.000000 1.000000 1.000000
+Kd 0.242558 0.123412 0.013872
+Ks 0.243449 0.046310 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\Soleh\Downloads\vwep\basilisk.png
+
+newmtl Rope
+Ns 13.725490
+Ka 1.000000 1.000000 1.000000
+Kd 0.638448 0.483442 0.362133
+Ks 0.958730 0.958730 0.958730
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\Soleh\Downloads\vwep\basilisk.png

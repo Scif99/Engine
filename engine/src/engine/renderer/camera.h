@@ -140,12 +140,15 @@ namespace engine
 
 		void set_view_matrix(glm::vec3 position, glm::vec3 look_at);
 
+
     private: 
         void process_mouse(float mouse_delta_x, float mouse_delta_y, bool constrain_pitch = true);
         void move(e_direction direction, timestep ts); 
         void rotate(e_rotation rotation, e_axis rotation_axis, timestep ts);
         void update_camera_vectors();
-        void update_view_matrix(); 
+        void update_view_matrix();
+
+       
 
     private: 
         glm::mat4   m_projection_mat{1}; 
@@ -180,6 +183,8 @@ namespace engine
         inline static float s_rotation_speed = 90.f;
         /// \brief in degrees per second. 
         inline static const float s_mouse_sensitivity = SENSITIVITY;
+
+        
     };
 
 }

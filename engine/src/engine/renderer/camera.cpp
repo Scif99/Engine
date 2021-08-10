@@ -67,12 +67,14 @@ engine::perspective_camera::perspective_camera(
     m_aspect_ratio(width / height), 
     m_fov(fov), 
     m_near_plane(near_z), 
-    m_far_plane(far_z) 
+    m_far_plane(far_z)
+    
 { 
     m_position = glm::vec3(0.0f, 2.0f, 5.0f);  
     m_front_vector = glm::vec3(0.0f, 0.0f, -1.0f);
     m_up_vector = glm::vec3(0.0f, 1.0f,  0.0f);
     m_view_mat = glm::lookAt(m_position, m_position + m_front_vector, m_up_vector);
+
 
     glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     //m_front_vector = glm::normalize(m_position - cameraTarget);
@@ -241,3 +243,6 @@ void engine::perspective_camera::update_camera_vectors()
     m_up_vector   = glm::normalize(glm::cross(m_right_vector, m_front_vector));
     update_view_matrix();
 }
+
+
+

@@ -1,6 +1,9 @@
 #pragma once
 #include <engine.h>
 #include "player.h"
+#include "cross_fade.h"
+
+
 class pickup;
 class player;
 
@@ -25,6 +28,9 @@ private:
 	engine::ref<engine::game_object>	m_mannequin{};
 	engine::ref<engine::game_object> m_jeep{};
 
+
+
+
 	// Characters
 
 	player m_player{};
@@ -32,6 +38,8 @@ private:
 	// Collectibles
 	engine::ref<pickup> m_health;
 	engine::ref<pickup> m_random;
+	engine::ref<pickup> m_bow;
+	engine::ref<pickup> m_wand;
 
 	
 	engine::ref<engine::material>		m_material{};
@@ -54,6 +62,9 @@ private:
 
     engine::orthographic_camera       m_2d_camera; 
     engine::perspective_camera        m_3d_camera;
+
+	// Special FX
+	engine::ref<cross_fade>							m_cross_fade{};
 	//Variable to track game score
 	int m_score{ 0 };
 };

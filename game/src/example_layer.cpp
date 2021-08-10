@@ -134,10 +134,12 @@ example_layer::example_layer()
 	jeep_props.meshes = jeep_model->meshes();
 	jeep_props.textures = jeep_model->textures();
 	float jeep_scale = 0.125f ;
-	jeep_props.position = { -5.f,0.5f, 0.f };
+	jeep_props.position = { 0.f,0.5f, 0.f };
 	jeep_props.scale = glm::vec3(jeep_scale);
 	jeep_props.bounding_shape = jeep_model->size() / 2.f * jeep_scale;
 	m_jeep = engine::game_object::create(jeep_props);
+
+
 
 
 	// Load the tree model. Create a tree object. Set its properties
@@ -188,6 +190,18 @@ example_layer::example_layer()
 	m_random = pickup::create(q_pickup_props);
 	m_random->init();
 
+	// Weapon model (from blender...)
+	engine::ref <engine::model> bow_model = engine::model::create("assets/models/static/cbow.obj");
+	engine::game_object_properties bow_props;
+	bow_props.meshes = bow_model->meshes();
+	bow_props.textures = bow_model->textures();
+	float bow_scale = 0.125f;
+	bow_props.position = { -2.f,1.f, 2.f };
+	bow_props.scale = glm::vec3(bow_scale);
+	bow_props.bounding_shape = bow_model->size() / 2.f * bow_scale;
+	m_bow = pickup::create(bow_props);
+	m_bow->init();
+
 
 	m_game_objects.push_back(m_terrain);
 	m_game_objects.push_back(m_ball);
@@ -199,8 +213,13 @@ example_layer::example_layer()
 	// Vector to store the in-game collectibles
 	m_collectibles.push_back(m_health);
 	m_collectibles.push_back(m_random);
+	m_collectibles.push_back(m_bow);
 
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
+
+	// create  special FX
+
+	m_cross_fade = cross_fade::create("assets/textures/Red.bmp", 2.0f, 1.6f, 0.9f);
 
 	m_text_manager = engine::text_manager::create();
 
@@ -222,11 +241,12 @@ void example_layer::on_update(const engine::timestep& time_step)
 		pickup->update(m_mannequin->position(), time_step); // Use the position of the manneqeuin to determine activity, rather than position of camera
 	}
 
-	// TO-FIX!
+	// TO-FIX! (use a timer)
 	if (!m_health->active())
 	{
 		m_player.set_health(m_player.health() + 50);
 	}
+
 
 
 	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
@@ -239,6 +259,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 
 	check_bounce();
+	// Update FX
+	m_cross_fade->on_update(time_step);
 }
 
 void example_layer::on_render() 
@@ -302,11 +324,29 @@ void example_layer::on_render()
 
 	//Render Jeep mesh
 	glm::mat4 jeep_transform(1.0f);
-	jeep_transform = glm::translate(glm::vec3(0.f,0.5f,0.f));
+	jeep_transform = glm::translate(m_jeep->position());
 	jeep_transform = glm::rotate(jeep_transform, -0.5f*glm::pi<float>(), glm::vec3(1.f, 0.f, 0.f));
 	jeep_transform = glm::scale(jeep_transform, m_jeep->scale());
 	engine::renderer::submit(textured_lighting_shader, jeep_transform, m_jeep);
 
+		// Render weapon
+	m_bow->textures().at(0)->bind(); // did nothing?
+	glm::mat4 bow_transform(1.0f);
+	bow_transform = glm::translate(m_bow->position()); // Move to where model is
+	bow_transform = glm::translate(bow_transform, glm::vec3(0.f, 0.3f * sin(m_bow->rotation_amount()), 0.f));
+	bow_transform = glm::rotate(bow_transform, m_bow->rotation_amount(), m_bow->rotation_axis());
+	bow_transform = glm::rotate(bow_transform, -0.5f * glm::pi<float>(), glm::vec3(0.f, 1.f, 0.f)); // Rotate so it is isnt sideways
+	bow_transform = glm::scale(bow_transform, 0.5f *m_bow->scale());
+	if (m_bow->active())
+	{
+		engine::renderer::submit(textured_lighting_shader, bow_transform,
+			m_bow);
+	}
+
+	//for (auto weapon : m_weapons)
+	//{Process equip(), and stuff...}
+
+	// Render health pickup
 	m_health->textures().at(0)->bind();
 	glm::mat4 pickup_transform(1.0f);
 	pickup_transform = glm::translate(pickup_transform, m_health->position());
@@ -378,6 +418,11 @@ void example_layer::on_render()
 	m_text_manager->render_text(text_shader, "_", centre.first +14.f, centre.second +3.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
 
+	//Render 2D
+
+	engine::renderer::begin_scene(m_2d_camera, textured_lighting_shader);
+	m_cross_fade->on_render(textured_lighting_shader);
+
 } 
 
 
@@ -397,6 +442,18 @@ void example_layer::on_event(engine::event& event)
 			m_player.toggle_fps();
 		}
 
+		// **TO-DO Change to when player gets hit
+		if (e.key_code() == engine::key_codes::KEY_1)
+		{
+			m_cross_fade->activate();
+			//m_3d_camera->shake();
+		}
+
+		if (e.key_code() == engine::key_codes::KEY_2)
+		{
+
+			//m_3d_camera->shake();
+		}
 
 
     } 
