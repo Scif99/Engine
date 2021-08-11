@@ -26,7 +26,12 @@ private:
 	engine::ref<engine::game_object>	m_tree{};
 	engine::ref<engine::game_object>	m_ball{};
 	engine::ref<engine::game_object>	m_mannequin{};
-	engine::ref<engine::game_object> m_jeep{};
+	engine::ref<engine::game_object>	m_jeep{};
+	engine::ref<engine::game_object>	m_tetrahedron{};
+	engine::ref<engine::game_object>	m_circle{};
+	
+
+
 
 
 
@@ -41,9 +46,9 @@ private:
 	engine::ref<pickup> m_bow;
 	engine::ref<pickup> m_wand;
 
-	
+	// Materials
 	engine::ref<engine::material>		m_material{};
-
+	engine::ref<engine::material> m_tetrahedron_material{};
 
 
 	// Light Sources

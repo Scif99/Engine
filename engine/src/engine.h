@@ -32,6 +32,9 @@
 #include "engine/entities/shapes/sphere.h"
 #include "engine/entities/terrain.h"
 #include "engine/entities/skybox.h"
+#include "engine/entities/shapes/tetrahedron.h"
+#include "engine/entities/shapes/circle.h"
+#include "engine/entities/shapes/wand.h"
 
 // ---utils---------------------------
 #include "engine/utils/bullet_manager.h"

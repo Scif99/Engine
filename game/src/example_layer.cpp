@@ -72,9 +72,16 @@ example_layer::example_layer()
 	std::dynamic_pointer_cast<engine::gl_shader>(text_shader)->set_uniform("projection",
 		glm::ortho(0.f, (float)engine::application::window().width(), 0.f,
 		(float)engine::application::window().height()));
+
 	// Set properties of materials
 	m_material = engine::material::create(1.0f, glm::vec3(1.0f, 0.1f, 0.07f),
 		glm::vec3(1.0f, 0.1f, 0.07f), glm::vec3(0.5f, 0.5f, 0.5f), 1.0f);
+
+	m_tetrahedron_material = engine::material::create(32.0f,
+		glm::vec3(1.0f, 0.5f, 0.0f),
+		glm::vec3(1.0f, 0.5f, 0.0f),
+		glm::vec3(0.5f, 0.5f, 0.5f),
+		0.3f);
 
 
 
@@ -164,6 +171,27 @@ example_layer::example_layer()
 	sphere_props.mass = 0.000001f;
 	m_ball = engine::game_object::create(sphere_props);
 
+
+	// Tetrahedron
+	std::vector<glm::vec3> tetrahedron_vertices;
+	tetrahedron_vertices.push_back(glm::vec3(0.f, 5.f, 0.f));//0
+	tetrahedron_vertices.push_back(glm::vec3(0.f, 0.f, 10.f));//1
+	tetrahedron_vertices.push_back(glm::vec3(-10.f, 0.f, -10.f)); //2
+	tetrahedron_vertices.push_back(glm::vec3(10.f, 0.f, -10.f)); //3
+	engine::ref<engine::tetrahedron> tetrahedron_shape =
+		engine::tetrahedron::create(tetrahedron_vertices);
+	engine::game_object_properties tetrahedron_props;
+	tetrahedron_props.position = { 0.f, 0.5f, -20.f };
+	tetrahedron_props.meshes = { tetrahedron_shape->mesh() };
+	m_tetrahedron = engine::game_object::create(tetrahedron_props);
+
+	 // Circle
+	engine::ref<engine::circle> circle_shape =	engine::circle::create(glm::vec3(-2.f,1.5f,2.f));
+	engine::game_object_properties circle_props;
+	circle_props.position = { -2.f,0.6f,2.f };
+	circle_props.meshes = { circle_shape->mesh() };
+	m_circle = engine::game_object::create(circle_props);
+
 	// Collectibles
 
 	// Cuboid ptr for shared use by collectibles
@@ -190,7 +218,7 @@ example_layer::example_layer()
 	m_random = pickup::create(q_pickup_props);
 	m_random->init();
 
-	// Weapon model (from blender...)
+	// Weapon model (from https://opengameart.org/content/bailisk-crossbow)
 	engine::ref <engine::model> bow_model = engine::model::create("assets/models/static/cbow.obj");
 	engine::game_object_properties bow_props;
 	bow_props.meshes = bow_model->meshes();
@@ -201,6 +229,10 @@ example_layer::example_layer()
 	bow_props.bounding_shape = bow_model->size() / 2.f * bow_scale;
 	m_bow = pickup::create(bow_props);
 	m_bow->init();
+
+
+
+	// Hexagon
 
 
 	m_game_objects.push_back(m_terrain);
@@ -378,11 +410,27 @@ void example_layer::on_render()
 	engine::renderer::begin_scene(m_3d_camera, material_shader);
 
 	
-	m_material->submit(material_shader);
+	m_material->submit(material_shader); //Pass sphere material to renderer
+
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position()); // 
 
 	// Render the sphere using material shader
 	engine::renderer::submit(material_shader, m_ball);
+
+	//Only render circles if weapon not picked up **Need to check if 2nd weapon is picked up too
+	if (m_bow->active())
+	{
+		glm::mat4 circle_transform(1.0f);
+		engine::renderer::submit(material_shader, m_circle);
+		circle_transform = glm::translate(circle_transform, glm::vec3(2.f, 0.6f, 2.f));
+		engine::renderer::submit(material_shader, circle_transform, m_circle);
+	}
+
+	m_tetrahedron_material->submit(material_shader); //Pass tetrahedron material to renderer
+	// Render tetrahedron with same shader
+	engine::renderer::submit(material_shader, m_tetrahedron);
+	
+
 
 
 	engine::renderer::end_scene();
