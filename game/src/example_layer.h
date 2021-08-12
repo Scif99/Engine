@@ -6,6 +6,7 @@
 
 class pickup;
 class player;
+class container;
 
 class example_layer : public engine::layer
 {
@@ -27,7 +28,7 @@ private:
 	engine::ref<engine::game_object>	m_ball{};
 	engine::ref<engine::game_object>	m_mannequin{};
 	engine::ref<engine::game_object>	m_jeep{};
-	engine::ref<engine::game_object>	m_tetrahedron{};
+	engine::ref<container>	m_tetrahedron{};
 	engine::ref<engine::game_object>	m_circle{};
 	
 
@@ -45,6 +46,9 @@ private:
 	engine::ref<pickup> m_random;
 	engine::ref<pickup> m_bow;
 	engine::ref<pickup> m_wand;
+
+	// Key containers
+	engine::ref<container> m_container;
 
 	// Materials
 	engine::ref<engine::material>		m_material{};

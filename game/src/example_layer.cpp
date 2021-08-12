@@ -9,6 +9,7 @@
 
 // Includes for collectibles
 #include "pickup.h"
+#include "container.h"
 #include "player.h"
 
 
@@ -175,15 +176,18 @@ example_layer::example_layer()
 	// Tetrahedron
 	std::vector<glm::vec3> tetrahedron_vertices;
 	tetrahedron_vertices.push_back(glm::vec3(0.f, 5.f, 0.f));//0
-	tetrahedron_vertices.push_back(glm::vec3(0.f, 0.f, 10.f));//1
-	tetrahedron_vertices.push_back(glm::vec3(-10.f, 0.f, -10.f)); //2
-	tetrahedron_vertices.push_back(glm::vec3(10.f, 0.f, -10.f)); //3
+	tetrahedron_vertices.push_back(glm::vec3(-5.f, 0.f, 5.f));//1
+	tetrahedron_vertices.push_back(glm::vec3(-5.f, 0.f, -5.f)); //2
+	tetrahedron_vertices.push_back(glm::vec3(5.f, 0.f, -5.f)); //3
+	tetrahedron_vertices.push_back(glm::vec3(5.f, 0.f, 5.f)); //4
+
 	engine::ref<engine::tetrahedron> tetrahedron_shape =
 		engine::tetrahedron::create(tetrahedron_vertices);
 	engine::game_object_properties tetrahedron_props;
-	tetrahedron_props.position = { 0.f, 0.5f, -20.f };
+	tetrahedron_props.position = { 2.f, 1.f, 4.f };
 	tetrahedron_props.meshes = { tetrahedron_shape->mesh() };
-	m_tetrahedron = engine::game_object::create(tetrahedron_props);
+	m_tetrahedron = container::create(tetrahedron_props);
+	m_tetrahedron->init();
 
 	 // Circle
 	engine::ref<engine::circle> circle_shape =	engine::circle::create(glm::vec3(-2.f,1.5f,2.f));
@@ -232,9 +236,6 @@ example_layer::example_layer()
 
 
 
-	// Hexagon
-
-
 	m_game_objects.push_back(m_terrain);
 	m_game_objects.push_back(m_ball);
 	//m_game_objects.push_back(m_cow);
@@ -279,6 +280,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 		m_player.set_health(m_player.health() + 50);
 	}
 
+	m_tetrahedron->update(m_mannequin->position(), time_step);
+
 
 
 	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
@@ -286,7 +289,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 	// Update player & camera
 	m_player.on_update(time_step);
 	m_player.update_camera(m_3d_camera);
-
+	LOG_CORE_ERROR("player pos :  '{}'.", m_mannequin->position());
+	LOG_CORE_ERROR("tet pos :  '{}'.", m_tetrahedron->position());
 
 
 
@@ -393,8 +397,7 @@ void example_layer::on_render()
 	m_random->textures().at(0)->bind();
 	glm::mat4 q_pickup_transform(1.0f);
 	q_pickup_transform = glm::translate(q_pickup_transform, m_random->position());
-	q_pickup_transform = glm::rotate(q_pickup_transform, m_random->rotation_amount(),
-		m_random->rotation_axis());
+	q_pickup_transform = glm::rotate(q_pickup_transform, m_random->rotation_amount(), m_random->rotation_axis());
 	q_pickup_transform = glm::scale(q_pickup_transform, glm::vec3(0.5f));
 	if (m_random->active())
 	{
@@ -426,12 +429,24 @@ void example_layer::on_render()
 		engine::renderer::submit(material_shader, circle_transform, m_circle);
 	}
 
-	m_tetrahedron_material->submit(material_shader); //Pass tetrahedron material to renderer
-	// Render tetrahedron with same shader
-	engine::renderer::submit(material_shader, m_tetrahedron);
+	// Render container & key
+	m_material->submit(material_shader); //Pass tetrahedron material to renderer
+	std::stack<glm::mat4> tet_stack;
+	// Top half
+	tet_stack.push(glm::mat4(1.0f));
+	tet_stack.top() = glm::translate(tet_stack.top(), m_tetrahedron->position());
+	tet_stack.top() = glm::rotate(tet_stack.top(), m_tetrahedron->rotation_amount(), m_tetrahedron->rotation_axis());
+	tet_stack.top() = glm::scale(tet_stack.top(), glm::vec3(0.05f));
+	engine::renderer::submit(material_shader, tet_stack.top(), m_tetrahedron);
+
+	tet_stack.top() = glm::translate(tet_stack.top(), glm::vec3(0.f, -1.f, 0.f));
+	tet_stack.top() = glm::rotate(tet_stack.top(), -1.f * glm::pi<float>(), glm::vec3(0.f, 0.f, 1.f));
+	engine::renderer::submit(material_shader, tet_stack.top(), m_tetrahedron);
+	tet_stack.pop();
+
+	//if (m_tetrahedron->activated())
+	// Render key
 	
-
-
 
 	engine::renderer::end_scene();
 
@@ -504,7 +519,14 @@ void example_layer::on_event(engine::event& event)
 		}
 
 
-    } 
+		if (e.key_code() == engine::key_codes::KEY_E && glm::length(m_mannequin->position() - m_tetrahedron->position()) < 2.f && !m_tetrahedron->activated()) // Event should only play if not activated yet
+		{
+			m_tetrahedron->activate();
+		}
+
+    }
+
+
 }
 
 void example_layer::check_bounce()
