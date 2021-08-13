@@ -19,7 +19,7 @@ engine::e_api_type engine::renderer_api::s_renderer_api = engine::e_api_type::op
 void engine::renderer_api::init()
 {
     glEnable(GL_DEPTH_TEST);
-    enable_alpha();
+    enable_alpha(); // Alpha is enabled by default
     enable_culling();
 }
 

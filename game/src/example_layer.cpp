@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtc/type_ptr.hpp>
 #include "engine/events/key_event.h"
+#include "engine/events/mouse_event.h"
 #include "engine/utils/track.h"
 
 
@@ -131,7 +132,7 @@ example_layer::example_layer()
 	cow_props.meshes = cow_model->meshes();
 	cow_props.textures = cow_model->textures();
 	float cow_scale = 1.f / glm::max(cow_model->size().x, glm::max(cow_model->size().y, cow_model->size().z));
-	cow_props.position = { -4.f,0.5f, -5.f };
+	cow_props.position = { 0.5f,0.5f, 5.f };
 	cow_props.scale = glm::vec3(cow_scale);
 	cow_props.bounding_shape = cow_model->size() / 2.f * cow_scale;
 	m_cow = engine::game_object::create(cow_props);
@@ -166,29 +167,50 @@ example_layer::example_layer()
 	engine::game_object_properties sphere_props;
 	sphere_props.position = { 0.f, 5.f, -5.f };
 	sphere_props.meshes = { sphere_shape->mesh() };
+	//Texture
 	sphere_props.type = 1;
 	sphere_props.bounding_shape = glm::vec3(0.5f);
 	sphere_props.restitution = 0.92f;
 	sphere_props.mass = 0.000001f;
 	m_ball = engine::game_object::create(sphere_props);
 
+	//ENEMIES
 
-	// Container (using tetrahedrons)
-	// Top
-	std::vector<glm::vec3> tetrahedron_vertices;
-	tetrahedron_vertices.push_back(glm::vec3(0.f, 5.f, 0.f));//0
-	tetrahedron_vertices.push_back(glm::vec3(-5.f, 0.f, 5.f));//1
-	tetrahedron_vertices.push_back(glm::vec3(-5.f, 0.f, -5.f)); //2
-	tetrahedron_vertices.push_back(glm::vec3(5.f, 0.f, -5.f)); //3
-	tetrahedron_vertices.push_back(glm::vec3(5.f, 0.f, 5.f)); //4
+	//Load blob model
+	m_blob.initialise(10.f,10.f);
+	engine::game_object_properties blob_props;
+	blob_props.position = { 10.f,1.f,10.f};
+	blob_props.meshes = { m_blob.top()->mesh(), m_blob.bottom()->mesh() };
+	////Texture
+	blob_props.type = 1;
+	//arrow_props.bounding_shape = glm::vec3(0.5f);
+	blob_props.restitution = 0.92f;
+	blob_props.mass = 0.000001f;
+	//m_blob.initialise(engine::game_object::create(blob_props));// Is this right?
 
-	engine::ref<engine::tetrahedron> tetrahedron_shape =
-		engine::tetrahedron::create(tetrahedron_vertices);
-	engine::game_object_properties tetrahedron_props;
-	tetrahedron_props.position = { 0.f, 1.f, -10.f };
-	tetrahedron_props.meshes = { tetrahedron_shape->mesh() };
-	m_top_tetrahedron = container::create(tetrahedron_props);
-	m_top_tetrahedron->init();
+
+	//// Arrow
+	//engine::ref<engine::sphere> arrow_shape = engine::sphere::create(10, 20, 0.5f);
+	//engine::game_object_properties arrow_props;
+	//arrow_props.position = { 0.f, 5.f, -5.f };
+	//arrow_props.meshes = { arrow_shape->mesh() };
+	////Texture
+	//arrow_props.type = 1;
+	//arrow_props.bounding_shape = glm::vec3(0.5f);
+	//arrow_props.restitution = 0.92f;
+	//arrow_props.mass = 0.000001f;
+	//m_arrow.initialise(engine::game_object::create(arrow_props));
+
+	m_arrow.initialise(1.0f, 0.5f, 0.f, -1.f, -1.f, 0.1f);
+	engine::game_object_properties arrow_props;
+	arrow_props.position = { 0.f, 10.f, -5.f };
+	arrow_props.meshes = { m_arrow.head()->mesh(), m_arrow.shaft()->mesh() };
+	////Texture
+	arrow_props.type = 1;
+	//arrow_props.bounding_shape = glm::vec3(0.5f);
+	arrow_props.restitution = 0.92f;
+	arrow_props.mass = 0.000001f;
+	m_ballistic.initialise(engine::game_object::create(arrow_props));// Is this right?
 
 
 
@@ -239,6 +261,18 @@ example_layer::example_layer()
 	m_bow->init();
 
 
+	// Key model from https://free3d.com/3d-model/low-poly-key-680139.html
+	engine::ref <engine::model> key_model = engine::model::create("assets/models/static/key.obj");
+	engine::game_object_properties key_props;
+	key_props.meshes = key_model->meshes();
+	key_props.textures = key_model->textures();
+	float key_scale = 0.005f;
+	key_props.position = { 0.f,1.5f, -7.f };
+	key_props.scale = glm::vec3(key_scale);
+	key_props.bounding_shape = key_model->size() / 2.f * key_scale;
+	m_key = pickup::create(key_props);
+	m_key->init();
+
 
 	m_game_objects.push_back(m_terrain);
 	m_game_objects.push_back(m_ball);
@@ -251,6 +285,10 @@ example_layer::example_layer()
 	m_collectibles.push_back(m_health);
 	m_collectibles.push_back(m_random);
 	m_collectibles.push_back(m_bow);
+	m_collectibles.push_back(m_key);
+
+	//Vector to store enemies
+	//m_enemies.push_back(m_blob);
 
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
 
@@ -286,19 +324,21 @@ void example_layer::on_update(const engine::timestep& time_step)
 		m_player.set_health(m_player.health() + 50);
 	}
 
-	m_top_tetrahedron->update(m_mannequin->position(), time_step);
 
 
-
-
+	// Update physics
 	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
+
+	// Update ballistics
+	m_ballistic.on_update(time_step);
 
 	// Update player & camera
 	m_player.on_update(time_step);
 	m_player.update_camera(m_3d_camera);
 	LOG_CORE_ERROR("player pos :  '{}'.", m_mannequin->position());
-	LOG_CORE_ERROR("tet pos :  '{}'.", m_top_tetrahedron->position());
 
+	//Update enemies
+	m_blob.on_update(time_step);
 
 
 	check_bounce();
@@ -354,11 +394,17 @@ void example_layer::on_render()
 
 	}
 
-	// Anglae between cow and camera
-	glm::vec3 p = glm::vec3(0.f, 0.5f, 5.f);
+	// Angle between cow and camera
+	glm::vec3 p = glm::vec3(m_cow->position());
 	glm::vec3 v = m_mannequin->position() - p;
 	//Note atan2 works for all quadrants
 	float theta = atan2(v.x, v.z);
+
+	glm::vec3 p_2 = glm::vec3(m_bow->position());
+	glm::vec3 v_2 = m_3d_camera.front_vector() - p_2;
+	//Note atan2 works for all quadrants
+	float theta_2 = atan2(v.x, v.z);
+
 
 	glm::mat4 cow_transform(1.0f);
 	cow_transform = glm::translate(cow_transform, p);
@@ -387,6 +433,18 @@ void example_layer::on_render()
 			m_bow);
 	}
 
+	else
+	{
+		bow_transform = glm::translate(m_mannequin->position()+glm::vec3(0.1f,0.6f,0.f)); // Move to where model is
+		bow_transform = glm::rotate(bow_transform, theta_2, glm::vec3(0.f,1.f,0.f));
+		bow_transform = glm::scale(bow_transform, 0.2f * m_bow->scale());
+		engine::renderer::submit(textured_lighting_shader, bow_transform,
+			m_bow);
+	}
+
+	//Render Key
+	engine::renderer::submit(textured_lighting_shader, m_key);
+
 	//for (auto weapon : m_weapons)
 	//{Process equip(), and stuff...}
 
@@ -414,6 +472,8 @@ void example_layer::on_render()
 	}
 
 
+
+
     engine::renderer::end_scene();
 
 	// Set up material shader. (does not render textures, renders materials instead)
@@ -427,9 +487,16 @@ void example_layer::on_render()
 
 	// Render the sphere using material shader
 	engine::renderer::submit(material_shader, m_ball);
+	// Render ballistic using same shader as for sphere
+	m_arrow.on_render(material_shader);
+	m_ballistic.on_render(material_shader);
+
+	m_blob.on_render(material_shader); //BLOB
 
 	// Render forcefield
 	m_forcefield->on_render(material_shader);
+
+	m_material->submit(material_shader); //Pass tetrahedron material to renderer
 
 	//Only render circles if weapon not picked up **Need to check if 2nd weapon is picked up too
 	if (m_bow->active())
@@ -441,24 +508,8 @@ void example_layer::on_render()
 	}
 
 	// Render container (& key)
-	m_material->submit(material_shader); //Pass tetrahedron material to renderer
-	std::stack<glm::mat4> tet_stack;
-	// Top half
-	tet_stack.push(glm::mat4(1.0f));
-	tet_stack.top() = glm::translate(tet_stack.top(), m_top_tetrahedron->position());
-	tet_stack.top() = glm::rotate(tet_stack.top(), m_top_tetrahedron->rotation_amount(), m_top_tetrahedron->rotation_axis());
-	tet_stack.top() = glm::scale(tet_stack.top(), glm::vec3(0.05f));
-	engine::renderer::submit(material_shader, tet_stack.top(), m_top_tetrahedron);
 
 
-
-	//tet_stack.top() = glm::translate(tet_stack.top(), glm::vec3(0.f, -1.f, 0.f) );
-	//tet_stack.top() = glm::rotate(tet_stack.top(), -1.f * glm::pi<float>(), glm::vec3(0.f, 0.f, 1.f));
-	//engine::renderer::submit(material_shader, tet_stack.top(), m_top_tetrahedron);
-	//tet_stack.pop();
-
-	//if (m_tetrahedron->activated())
-	// Render key
 	
 
 	engine::renderer::end_scene();
@@ -472,6 +523,7 @@ void example_layer::on_render()
 	glm::mat4 aniTransform = glm::mat4(1.0f);
 
 	engine::renderer::submit(animated_mesh_shader, m_mannequin);
+
 
 	engine::renderer::end_scene();
 
@@ -534,18 +586,43 @@ void example_layer::on_event(engine::event& event)
 		}
 
 
+
 		// If player tries to move into forcefield before defeating all the enemies
-		if (glm::length(m_mannequin->position() - m_top_tetrahedron->position()) < 3.f && !m_top_tetrahedron->activated()) // Event should only play if not activated yet
+		if (glm::length(m_mannequin->position() - m_key->position()) < 3.f) // Event should only play if not activated yet
 		{
-			//m_top_tetrahedron->activate();
-			m_forcefield->activate(2.f, m_top_tetrahedron->position());
+			
+			m_forcefield->activate(2.f, m_key->position());
 			m_cross_fade->activate();
 			m_player.set_health(m_player.health()-10);
 			// Render soome text?
+			// Add a collision
 
 		}
 
+		// If player tries to move to blobbefore defeating all the enemies
+		if (glm::length(m_mannequin->position() - m_blob.position() ) < 3.f && !m_blob.dead()) // Event should only play if blob is not dead
+		{
+			m_cross_fade->activate();
+			m_blob.set_health(m_blob.health() - 2);
+			m_player.set_health(m_player.health() - 10);
+			// Render soome text?
+			// Add a collision
+
+		}
+
+
     }
+
+	// Events involving the mouse
+	if (event.event_type() == engine::event_type_e::mouse_button_pressed)
+	{
+		auto& e = dynamic_cast<engine::mouse_button_pressed_event&>(event);
+		if (e.mouse_button() == engine::mouse_button_codes::MOUSE_BUTTON_LEFT) //Left click
+		{
+			m_ballistic.fire(m_mannequin, 25.0f); // Fire from player's position
+		}
+
+	}
 
 
 }

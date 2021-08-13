@@ -1371,8 +1371,8 @@
     <ClInclude Include="src\engine\entities\shapes\circle.h">
       <Filter>src\engine\entities\shapes</Filter>
     </ClInclude>
-    <ClInclude Include="src\engine\entities\shapes\wand.h">
-      <Filter>src\engine\entities\shapes</Filter>
+    <ClInclude Include="src\engine\entities\enemy.h">
+      <Filter>src\engine\entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1508,8 +1508,8 @@
     <ClCompile Include="src\engine\entities\shapes\circle.cpp">
       <Filter>src\engine\entities\shapes</Filter>
     </ClCompile>
-    <ClCompile Include="src\engine\entities\shapes\wand.cpp">
-      <Filter>src\engine\entities\shapes</Filter>
+    <ClCompile Include="src\engine\entities\enemy.cpp">
+      <Filter>src\engine\entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

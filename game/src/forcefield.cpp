@@ -30,6 +30,8 @@ void alpha_sphere::on_update(const engine::timestep& time_step)
 	float f = m_timer / m_max_time;
 	if (f > 1.0f)
 		f = 1.0f;
+
+	// Make it 'glow' over time
 	m_material->set_ambient((1 - f) * m_start_colour + f * m_end_colour);
 
 	m_timer += (float)time_step;

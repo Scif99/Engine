@@ -1,8 +1,12 @@
 #pragma once
 #include <engine.h>
 #include "player.h"
+
+#include "ballistic.h"
 #include "cross_fade.h"
 #include "forcefield.h"
+#include "arrow.h"
+#include "blob.h"
 
 
 
@@ -30,7 +34,7 @@ private:
 	engine::ref<engine::game_object>	m_ball{};
 	engine::ref<engine::game_object>	m_mannequin{};
 	engine::ref<engine::game_object>	m_jeep{};
-	engine::ref<container>	m_top_tetrahedron{};
+
 
 
 	engine::ref<engine::game_object>	m_circle{};
@@ -44,12 +48,18 @@ private:
 	// Characters
 
 	player m_player{};
+	blob m_blob;
+
+	// Ballistics
+	arrow m_arrow;
+	ballistic m_ballistic;
 
 	// Collectibles
 	engine::ref<pickup> m_health;
 	engine::ref<pickup> m_random;
 	engine::ref<pickup> m_bow;
 	engine::ref<pickup> m_wand;
+	engine::ref<pickup> m_key;
 
 	// Key containers
 	engine::ref<container> m_container;
@@ -67,6 +77,8 @@ private:
 	// Containters for objects
 	std::vector<engine::ref<engine::game_object>>   m_game_objects{};
 	std::vector<engine::ref<pickup>>	m_collectibles{};
+	std::vector<engine::ref<engine::game_object>>	m_enemies{};
+
 
 	engine::ref<engine::bullet_manager> m_physics_manager{};
 	engine::ref<engine::audio_manager>  m_audio_manager{};
