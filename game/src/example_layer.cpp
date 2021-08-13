@@ -173,7 +173,8 @@ example_layer::example_layer()
 	m_ball = engine::game_object::create(sphere_props);
 
 
-	// Tetrahedron
+	// Container (using tetrahedrons)
+	// Top
 	std::vector<glm::vec3> tetrahedron_vertices;
 	tetrahedron_vertices.push_back(glm::vec3(0.f, 5.f, 0.f));//0
 	tetrahedron_vertices.push_back(glm::vec3(-5.f, 0.f, 5.f));//1
@@ -184,10 +185,13 @@ example_layer::example_layer()
 	engine::ref<engine::tetrahedron> tetrahedron_shape =
 		engine::tetrahedron::create(tetrahedron_vertices);
 	engine::game_object_properties tetrahedron_props;
-	tetrahedron_props.position = { 2.f, 1.f, 4.f };
+	tetrahedron_props.position = { 0.f, 1.f, -10.f };
 	tetrahedron_props.meshes = { tetrahedron_shape->mesh() };
-	m_tetrahedron = container::create(tetrahedron_props);
-	m_tetrahedron->init();
+	m_top_tetrahedron = container::create(tetrahedron_props);
+	m_top_tetrahedron->init();
+
+
+
 
 	 // Circle
 	engine::ref<engine::circle> circle_shape =	engine::circle::create(glm::vec3(-2.f,1.5f,2.f));
@@ -254,6 +258,8 @@ example_layer::example_layer()
 
 	m_cross_fade = cross_fade::create("assets/textures/Red.bmp", 2.0f, 1.6f, 0.9f);
 
+	m_forcefield = alpha_sphere::create(glm::vec3(1.f, 0.f, 1.0f), glm::vec3(0.f, 0.f, 1.f), true, 0.25f, 3.0f);
+
 	m_text_manager = engine::text_manager::create();
 
 	m_skinned_mesh->switch_animation(1);
@@ -280,7 +286,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 		m_player.set_health(m_player.health() + 50);
 	}
 
-	m_tetrahedron->update(m_mannequin->position(), time_step);
+	m_top_tetrahedron->update(m_mannequin->position(), time_step);
+
 
 
 
@@ -290,13 +297,14 @@ void example_layer::on_update(const engine::timestep& time_step)
 	m_player.on_update(time_step);
 	m_player.update_camera(m_3d_camera);
 	LOG_CORE_ERROR("player pos :  '{}'.", m_mannequin->position());
-	LOG_CORE_ERROR("tet pos :  '{}'.", m_tetrahedron->position());
+	LOG_CORE_ERROR("tet pos :  '{}'.", m_top_tetrahedron->position());
 
 
 
 	check_bounce();
 	// Update FX
 	m_cross_fade->on_update(time_step);
+	m_forcefield->on_update(time_step);
 }
 
 void example_layer::on_render() 
@@ -420,6 +428,9 @@ void example_layer::on_render()
 	// Render the sphere using material shader
 	engine::renderer::submit(material_shader, m_ball);
 
+	// Render forcefield
+	m_forcefield->on_render(material_shader);
+
 	//Only render circles if weapon not picked up **Need to check if 2nd weapon is picked up too
 	if (m_bow->active())
 	{
@@ -429,20 +440,22 @@ void example_layer::on_render()
 		engine::renderer::submit(material_shader, circle_transform, m_circle);
 	}
 
-	// Render container & key
+	// Render container (& key)
 	m_material->submit(material_shader); //Pass tetrahedron material to renderer
 	std::stack<glm::mat4> tet_stack;
 	// Top half
 	tet_stack.push(glm::mat4(1.0f));
-	tet_stack.top() = glm::translate(tet_stack.top(), m_tetrahedron->position());
-	tet_stack.top() = glm::rotate(tet_stack.top(), m_tetrahedron->rotation_amount(), m_tetrahedron->rotation_axis());
+	tet_stack.top() = glm::translate(tet_stack.top(), m_top_tetrahedron->position());
+	tet_stack.top() = glm::rotate(tet_stack.top(), m_top_tetrahedron->rotation_amount(), m_top_tetrahedron->rotation_axis());
 	tet_stack.top() = glm::scale(tet_stack.top(), glm::vec3(0.05f));
-	engine::renderer::submit(material_shader, tet_stack.top(), m_tetrahedron);
+	engine::renderer::submit(material_shader, tet_stack.top(), m_top_tetrahedron);
 
-	tet_stack.top() = glm::translate(tet_stack.top(), glm::vec3(0.f, -1.f, 0.f));
-	tet_stack.top() = glm::rotate(tet_stack.top(), -1.f * glm::pi<float>(), glm::vec3(0.f, 0.f, 1.f));
-	engine::renderer::submit(material_shader, tet_stack.top(), m_tetrahedron);
-	tet_stack.pop();
+
+
+	//tet_stack.top() = glm::translate(tet_stack.top(), glm::vec3(0.f, -1.f, 0.f) );
+	//tet_stack.top() = glm::rotate(tet_stack.top(), -1.f * glm::pi<float>(), glm::vec3(0.f, 0.f, 1.f));
+	//engine::renderer::submit(material_shader, tet_stack.top(), m_top_tetrahedron);
+	//tet_stack.pop();
 
 	//if (m_tetrahedron->activated())
 	// Render key
@@ -453,6 +466,8 @@ void example_layer::on_render()
 	const auto animated_mesh_shader = engine::renderer::shaders_library()->get("animated_mesh");
 	engine::renderer::begin_scene(m_3d_camera, animated_mesh_shader);
 	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position());
+
+	// Render FX
 
 	glm::mat4 aniTransform = glm::mat4(1.0f);
 
@@ -519,9 +534,15 @@ void example_layer::on_event(engine::event& event)
 		}
 
 
-		if (e.key_code() == engine::key_codes::KEY_E && glm::length(m_mannequin->position() - m_tetrahedron->position()) < 2.f && !m_tetrahedron->activated()) // Event should only play if not activated yet
+		// If player tries to move into forcefield before defeating all the enemies
+		if (glm::length(m_mannequin->position() - m_top_tetrahedron->position()) < 3.f && !m_top_tetrahedron->activated()) // Event should only play if not activated yet
 		{
-			m_tetrahedron->activate();
+			//m_top_tetrahedron->activate();
+			m_forcefield->activate(2.f, m_top_tetrahedron->position());
+			m_cross_fade->activate();
+			m_player.set_health(m_player.health()-10);
+			// Render soome text?
+
 		}
 
     }

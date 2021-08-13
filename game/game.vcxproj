@@ -134,6 +134,7 @@
     <ClInclude Include="src\cross_fade.h" />
     <ClInclude Include="src\container.h" />
     <ClInclude Include="src\example_layer.h" />
+    <ClInclude Include="src\forcefield.h" />
     <ClInclude Include="src\pickup.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\quad.h" />
@@ -142,6 +143,7 @@
     <ClCompile Include="src\cross_fade.cpp" />
     <ClCompile Include="src\container.cpp" />
     <ClCompile Include="src\example_layer.cpp" />
+    <ClCompile Include="src\forcefield.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\pickup.cpp" />
     <ClCompile Include="src\player.cpp" />

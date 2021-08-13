@@ -2,6 +2,8 @@
 #include <engine.h>
 #include "player.h"
 #include "cross_fade.h"
+#include "forcefield.h"
+
 
 
 class pickup;
@@ -28,7 +30,9 @@ private:
 	engine::ref<engine::game_object>	m_ball{};
 	engine::ref<engine::game_object>	m_mannequin{};
 	engine::ref<engine::game_object>	m_jeep{};
-	engine::ref<container>	m_tetrahedron{};
+	engine::ref<container>	m_top_tetrahedron{};
+
+
 	engine::ref<engine::game_object>	m_circle{};
 	
 
@@ -74,6 +78,7 @@ private:
 
 	// Special FX
 	engine::ref<cross_fade>							m_cross_fade{};
+	engine::ref<alpha_sphere>						m_forcefield{};
 	//Variable to track game score
 	int m_score{ 0 };
 };

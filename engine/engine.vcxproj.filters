@@ -43,9 +43,6 @@
     <Filter Include="src\engine\entities\shapes">
       <UniqueIdentifier>{59CE606E-45DE-0C3F-AE97-715D9AC6FBD7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\engine\events">
-      <UniqueIdentifier>{F66870E7-627F-6E7D-ABF6-F99E174C3F05}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\engine\renderer">
       <UniqueIdentifier>{388D297C-A4EE-068A-2D5C-4D3C99BC3D49}</UniqueIdentifier>
     </Filter>
@@ -60,6 +57,9 @@
     </Filter>
     <Filter Include="src\platform\windows">
       <UniqueIdentifier>{9B5931A8-87E8-BA71-3007-CF6C1C75CB17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\engine\entities\events">
+      <UniqueIdentifier>{F66870E7-627F-6E7D-ABF6-F99E174C3F05}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1237,16 +1237,16 @@
       <Filter>src\engine\entities</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\events\application_event.h">
-      <Filter>src\engine\events</Filter>
+      <Filter>src\engine\entities\events</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\events\event.h">
-      <Filter>src\engine\events</Filter>
+      <Filter>src\engine\entities\events</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\events\key_event.h">
-      <Filter>src\engine\events</Filter>
+      <Filter>src\engine\entities\events</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\events\mouse_event.h">
-      <Filter>src\engine\events</Filter>
+      <Filter>src\engine\entities\events</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\key_codes.h">
       <Filter>src\engine</Filter>

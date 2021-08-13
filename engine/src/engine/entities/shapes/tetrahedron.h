@@ -14,6 +14,7 @@ namespace engine
 		std::vector<glm::vec3> vertices() const { return m_vertices; }
 		ref<engine::mesh> mesh() const { return m_mesh; }
 		static ref<tetrahedron> create(std::vector<glm::vec3> vertices);
+
 	private:
 		/// \brief Fields
 		// vertices of the tetrahedron specified by a vector of positions.
