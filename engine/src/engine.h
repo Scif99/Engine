@@ -32,6 +32,8 @@
 #include "engine/entities/game_object.h"
 #include "engine/entities/shapes/cuboid.h"
 #include "engine/entities/shapes/sphere.h"
+#include "engine/entities/shapes/triangle.h"
+#include "engine/entities/shapes/cone.h"
 #include "engine/entities/terrain.h"
 #include "engine/entities/skybox.h"
 #include "engine/entities/shapes/tetrahedron.h"

@@ -3,21 +3,21 @@ namespace engine
 {
 	class mesh;
 	/// \brief Class creating a circle object with a mesh of a specified size
-	class circle
+	class triangle
 	{
 	public:
 		/// \brief Constructor
-		circle(float radius);
+		triangle(std::vector<glm::vec3> vertices);
 		/// \brief Destructor
-		~circle();
+		~triangle();
 		/// \brief Getter methods
-		float radius() const { return m_radius; }
+		std::vector<glm::vec3> vertices() const { return m_vertices; }
 		ref<engine::mesh> mesh() const { return m_mesh; }
-		static ref<circle> create(float radius);
+		static ref<triangle> create(std::vector<glm::vec3> vertices);
 	private:
 		/// \brief Fields
-		// vertices of the circle specified by a vector of positions.
-		glm::vec3 m_centre;
+		// vertices of the triangle specified by a vector of coordinates.
+		std::vector<glm::vec3> m_vertices;
 		ref<engine::mesh> m_mesh;
 		float m_radius;
 	};

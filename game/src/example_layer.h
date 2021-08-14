@@ -7,12 +7,14 @@
 #include "forcefield.h"
 #include "arrow.h"
 #include "blob.h"
+#include "pickup_container.h"
 
 
 
 class pickup;
 class player;
-class container;
+class blob;
+
 
 class example_layer : public engine::layer
 {
@@ -38,7 +40,10 @@ private:
 
 
 	engine::ref<engine::game_object>	m_circle{};
-	
+	engine::ref<engine::game_object>	m_triangle{};
+	engine::ref<engine::game_object>	m_cone{};
+
+	engine::ref<engine::game_object> m_cont{};
 
 
 
@@ -53,16 +58,15 @@ private:
 	// Ballistics
 	arrow m_arrow;
 	ballistic m_ballistic;
-
+	pickup_container m_pickup_container;
 	// Collectibles
 	engine::ref<pickup> m_health;
 	engine::ref<pickup> m_random;
 	engine::ref<pickup> m_bow;
 	engine::ref<pickup> m_wand;
 	engine::ref<pickup> m_key;
+	
 
-	// Key containers
-	engine::ref<container> m_container;
 
 	// Materials
 	engine::ref<engine::material>		m_material{};

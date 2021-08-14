@@ -10,7 +10,6 @@
 
 // Includes for collectibles
 #include "pickup.h"
-#include "container.h"
 #include "player.h"
 
 
@@ -114,6 +113,8 @@ example_layer::example_layer()
 		
 	m_player.initialise(m_mannequin);
 
+	// ENVIRONMENT
+
 	// Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
 	std::vector<engine::ref<engine::texture_2d>> terrain_textures = { engine::texture_2d::create("assets/textures/terrain.bmp", false) };
 	engine::ref<engine::terrain> terrain_shape = engine::terrain::create(100.f, 0.5f, 100.f);
@@ -147,8 +148,6 @@ example_layer::example_layer()
 	jeep_props.scale = glm::vec3(jeep_scale);
 	jeep_props.bounding_shape = jeep_model->size() / 2.f * jeep_scale;
 	m_jeep = engine::game_object::create(jeep_props);
-
-
 
 
 	// Load the tree model. Create a tree object. Set its properties
@@ -189,18 +188,6 @@ example_layer::example_layer()
 	//m_blob.initialise(engine::game_object::create(blob_props));// Is this right?
 
 
-	//// Arrow
-	//engine::ref<engine::sphere> arrow_shape = engine::sphere::create(10, 20, 0.5f);
-	//engine::game_object_properties arrow_props;
-	//arrow_props.position = { 0.f, 5.f, -5.f };
-	//arrow_props.meshes = { arrow_shape->mesh() };
-	////Texture
-	//arrow_props.type = 1;
-	//arrow_props.bounding_shape = glm::vec3(0.5f);
-	//arrow_props.restitution = 0.92f;
-	//arrow_props.mass = 0.000001f;
-	//m_arrow.initialise(engine::game_object::create(arrow_props));
-
 	m_arrow.initialise(1.0f, 0.5f, 0.f, -1.f, -1.f, 0.1f);
 	engine::game_object_properties arrow_props;
 	arrow_props.position = { 0.f, 10.f, -5.f };
@@ -212,15 +199,44 @@ example_layer::example_layer()
 	arrow_props.mass = 0.000001f;
 	m_ballistic.initialise(engine::game_object::create(arrow_props));// Is this right?
 
-
+	//Cone
+	//engine::ref<engine::cone> cone_shape=
+	//	engine::cone::create(1.f, 3.f);
+	//engine::game_object_properties cone_props;
+	//cone_props.position = { 0.f, 0.5f, 10.f };
+	//cone_props.meshes = { cone_shape->mesh() };
+	//m_cone = engine::game_object::create(cone_props);
 
 
 	 // Circle
-	engine::ref<engine::circle> circle_shape =	engine::circle::create(glm::vec3(-2.f,1.5f,2.f));
+	engine::ref<engine::circle> circle_shape =	engine::circle::create(1);
 	engine::game_object_properties circle_props;
 	circle_props.position = { -2.f,0.6f,2.f };
 	circle_props.meshes = { circle_shape->mesh() };
-	m_circle = engine::game_object::create(circle_props);
+	m_circle = engine::game_object::create(circle_props);
+
+	//Triangle
+	std::vector<glm::vec3> triangle_vertices;
+	triangle_vertices.push_back(glm::vec3(0.f, 0.5f, 0.f));//base
+	triangle_vertices.push_back(glm::vec3(0.f, 0.5f, 1.f));//1
+	triangle_vertices.push_back(glm::vec3(1.f, 1.5f, 0.f)); //2
+	engine::ref<engine::triangle> triangle_shape = engine::triangle::create(triangle_vertices);
+	engine::game_object_properties triangle_props;
+	triangle_props.position = { 0.f,0.6f,5.f };
+	triangle_props.meshes = { triangle_shape->mesh() };
+	m_triangle = engine::game_object::create(triangle_props);
+
+	//Pickup container
+	//m_pickup_container.initialise();
+	//engine::game_object_properties cont_props;
+	//cont_props.position = { 0.f, 1.f, -3.f };
+	//cont_props.meshes = { m_pickup_container.triangle()->mesh(), m_pickup_container.circle()->mesh() };
+	////Texture
+	//cont_props.type = 1;
+	//arrow_props.bounding_shape = glm::vec3(0.5f);
+	//cont_props.restitution = 0.92f;
+	//cont_props.mass = 0.000001f;
+	//m_cont = engine::game_object::create(cont_props);
 
 	// Collectibles
 
@@ -296,7 +312,7 @@ example_layer::example_layer()
 
 	m_cross_fade = cross_fade::create("assets/textures/Red.bmp", 2.0f, 1.6f, 0.9f);
 
-	m_forcefield = alpha_sphere::create(glm::vec3(1.f, 0.f, 1.0f), glm::vec3(0.f, 0.f, 1.f), true, 0.25f, 3.0f);
+	m_forcefield = alpha_sphere::create(glm::vec3(1.f, 0.f, 1.0f), glm::vec3(0.f, 0.f, 1.f), true, 0.25f, 2.0f);
 
 	m_text_manager = engine::text_manager::create();
 
@@ -324,7 +340,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 		m_player.set_health(m_player.health() + 50);
 	}
 
-
+	m_pickup_container.on_update(time_step);
 
 	// Update physics
 	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
@@ -336,6 +352,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 	m_player.on_update(time_step);
 	m_player.update_camera(m_3d_camera);
 	LOG_CORE_ERROR("player pos :  '{}'.", m_mannequin->position());
+	LOG_CORE_ERROR("circle pos :  '{}'.", m_circle->position());
+
 
 	//Update enemies
 	m_blob.on_update(time_step);
@@ -487,11 +505,16 @@ void example_layer::on_render()
 
 	// Render the sphere using material shader
 	engine::renderer::submit(material_shader, m_ball);
+
+
 	// Render ballistic using same shader as for sphere
 	m_arrow.on_render(material_shader);
 	m_ballistic.on_render(material_shader);
 
 	m_blob.on_render(material_shader); //BLOB
+
+	// RENDER CONE
+	//engine::renderer::submit(material_shader, m_cone);
 
 	// Render forcefield
 	m_forcefield->on_render(material_shader);
@@ -506,8 +529,7 @@ void example_layer::on_render()
 		circle_transform = glm::translate(circle_transform, glm::vec3(2.f, 0.6f, 2.f));
 		engine::renderer::submit(material_shader, circle_transform, m_circle);
 	}
-
-	// Render container (& key)
+	engine::renderer::submit(material_shader, m_triangle);
 
 
 	
