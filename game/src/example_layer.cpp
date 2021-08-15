@@ -204,7 +204,7 @@ example_layer::example_layer()
 	 // Circle
 	engine::ref<engine::circle> circle_shape =	engine::circle::create(1);
 	engine::game_object_properties circle_props;
-	circle_props.position = { -2.f,1.6f,2.f };
+	circle_props.position = { -2.f,0.6f,2.f };
 	circle_props.meshes = { circle_shape->mesh() };
 	m_circle = engine::game_object::create(circle_props);
 
@@ -494,7 +494,7 @@ void example_layer::on_render()
 
 
 	// Render ballistic using same shader as for sphere
-	m_arrow.on_render(material_shader);
+	//m_arrow.on_render(material_shader);
 	m_ballistic.on_render(material_shader);
 
 	m_blob.on_render(material_shader); //BLOB
