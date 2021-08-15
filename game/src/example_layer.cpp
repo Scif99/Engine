@@ -17,7 +17,6 @@ example_layer::example_layer()
     :m_2d_camera(-1.6f, 1.6f, -0.9f, 0.9f), 
     m_3d_camera((float)engine::application::window().width(), (float)engine::application::window().height())
 
-
 {
 
     // Hide the mouse and lock it inside the window
@@ -144,7 +143,7 @@ example_layer::example_layer()
 	jeep_props.meshes = jeep_model->meshes();
 	jeep_props.textures = jeep_model->textures();
 	float jeep_scale = 0.125f ;
-	jeep_props.position = { 0.f,0.5f, 0.f };
+	jeep_props.position = { 0.f,0.5f, 10.f };
 	jeep_props.scale = glm::vec3(jeep_scale);
 	jeep_props.bounding_shape = jeep_model->size() / 2.f * jeep_scale;
 	m_jeep = engine::game_object::create(jeep_props);
@@ -199,44 +198,22 @@ example_layer::example_layer()
 	arrow_props.mass = 0.000001f;
 	m_ballistic.initialise(engine::game_object::create(arrow_props));// Is this right?
 
-	//Cone
-	//engine::ref<engine::cone> cone_shape=
-	//	engine::cone::create(1.f, 3.f);
-	//engine::game_object_properties cone_props;
-	//cone_props.position = { 0.f, 0.5f, 10.f };
-	//cone_props.meshes = { cone_shape->mesh() };
-	//m_cone = engine::game_object::create(cone_props);
+
 
 
 	 // Circle
 	engine::ref<engine::circle> circle_shape =	engine::circle::create(1);
 	engine::game_object_properties circle_props;
-	circle_props.position = { -2.f,0.6f,2.f };
+	circle_props.position = { -2.f,1.6f,2.f };
 	circle_props.meshes = { circle_shape->mesh() };
 	m_circle = engine::game_object::create(circle_props);
 
-	//Triangle
-	std::vector<glm::vec3> triangle_vertices;
-	triangle_vertices.push_back(glm::vec3(0.f, 0.5f, 0.f));//base
-	triangle_vertices.push_back(glm::vec3(0.f, 0.5f, 1.f));//1
-	triangle_vertices.push_back(glm::vec3(1.f, 1.5f, 0.f)); //2
-	engine::ref<engine::triangle> triangle_shape = engine::triangle::create(triangle_vertices);
-	engine::game_object_properties triangle_props;
-	triangle_props.position = { 0.f,0.6f,5.f };
-	triangle_props.meshes = { triangle_shape->mesh() };
-	m_triangle = engine::game_object::create(triangle_props);
 
-	//Pickup container
-	//m_pickup_container.initialise();
-	//engine::game_object_properties cont_props;
-	//cont_props.position = { 0.f, 1.f, -3.f };
-	//cont_props.meshes = { m_pickup_container.triangle()->mesh(), m_pickup_container.circle()->mesh() };
-	////Texture
-	//cont_props.type = 1;
-	//arrow_props.bounding_shape = glm::vec3(0.5f);
-	//cont_props.restitution = 0.92f;
-	//cont_props.mass = 0.000001f;
-	//m_cont = engine::game_object::create(cont_props);
+	// House
+	m_house.initialise(2.f, 2.f, 5.f, 5.f);
+
+
+
 
 	// Collectibles
 
@@ -283,7 +260,7 @@ example_layer::example_layer()
 	key_props.meshes = key_model->meshes();
 	key_props.textures = key_model->textures();
 	float key_scale = 0.005f;
-	key_props.position = { 0.f,1.5f, -7.f };
+	key_props.position = { 0.f,1.5f, -20.f };
 	key_props.scale = glm::vec3(key_scale);
 	key_props.bounding_shape = key_model->size() / 2.f * key_scale;
 	m_key = pickup::create(key_props);
@@ -437,6 +414,9 @@ void example_layer::on_render()
 	jeep_transform = glm::scale(jeep_transform, m_jeep->scale());
 	engine::renderer::submit(textured_lighting_shader, jeep_transform, m_jeep);
 
+
+
+
 		// Render weapon
 	m_bow->textures().at(0)->bind(); // did nothing?
 	glm::mat4 bow_transform(1.0f);
@@ -462,6 +442,8 @@ void example_layer::on_render()
 
 	//Render Key
 	engine::renderer::submit(textured_lighting_shader, m_key);
+
+
 
 	//for (auto weapon : m_weapons)
 	//{Process equip(), and stuff...}
@@ -498,7 +480,11 @@ void example_layer::on_render()
 	const auto material_shader = engine::renderer::shaders_library()->get("mesh_material");
 	engine::renderer::begin_scene(m_3d_camera, material_shader);
 
-	
+
+
+	// Render House
+	m_house.on_render(material_shader);
+
 	m_material->submit(material_shader); //Pass sphere material to renderer
 
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position()); // 
@@ -513,9 +499,9 @@ void example_layer::on_render()
 
 	m_blob.on_render(material_shader); //BLOB
 
-	// RENDER CONE
-	//engine::renderer::submit(material_shader, m_cone);
 
+
+	
 	// Render forcefield
 	m_forcefield->on_render(material_shader);
 
@@ -529,7 +515,6 @@ void example_layer::on_render()
 		circle_transform = glm::translate(circle_transform, glm::vec3(2.f, 0.6f, 2.f));
 		engine::renderer::submit(material_shader, circle_transform, m_circle);
 	}
-	engine::renderer::submit(material_shader, m_triangle);
 
 
 	
@@ -545,7 +530,6 @@ void example_layer::on_render()
 	glm::mat4 aniTransform = glm::mat4(1.0f);
 
 	engine::renderer::submit(animated_mesh_shader, m_mannequin);
-
 
 	engine::renderer::end_scene();
 

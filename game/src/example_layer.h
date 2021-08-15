@@ -6,6 +6,7 @@
 #include "cross_fade.h"
 #include "forcefield.h"
 #include "arrow.h"
+#include "house.h"
 #include "blob.h"
 #include "pickup_container.h"
 
@@ -41,12 +42,10 @@ private:
 
 	engine::ref<engine::game_object>	m_circle{};
 	engine::ref<engine::game_object>	m_triangle{};
-	engine::ref<engine::game_object>	m_cone{};
-
-	engine::ref<engine::game_object> m_cont{};
 
 
 
+	house m_house;
 
 
 

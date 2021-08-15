@@ -26,7 +26,7 @@ void ballistic::on_update(const engine::timestep& time_step)
 // Function to set the ballistic to the correct position before firing
 void ballistic::fire(const engine::ref<engine::game_object> player, float speed)
 {
-	m_object->set_position(player->position()+glm::vec3(0.1f,0.5f,0.f));
+	m_object->set_position(player->position() + glm::vec3(0.1f, 0.5f, 0.f));
 	m_object->set_velocity(25.0f * player->forward());
 	//m_object->set_acceleration(3.0f * kick * camera.front_vector());
 	m_object->set_forward(player->forward());

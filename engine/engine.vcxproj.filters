@@ -1374,6 +1374,12 @@
     <ClInclude Include="src\engine\entities\enemy.h">
       <Filter>src\engine\entities</Filter>
     </ClInclude>
+    <ClInclude Include="src\engine\entities\shapes\triangle.h">
+      <Filter>src\engine\entities\shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\entities\shapes\cone.h">
+      <Filter>src\engine\entities\shapes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\engine\core\application.cpp">
@@ -1510,6 +1516,12 @@
     </ClCompile>
     <ClCompile Include="src\engine\entities\enemy.cpp">
       <Filter>src\engine\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\entities\shapes\triangle.cpp">
+      <Filter>src\engine\entities\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\entities\shapes\cone.cpp">
+      <Filter>src\engine\entities\shapes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

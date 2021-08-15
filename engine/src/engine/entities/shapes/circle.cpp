@@ -30,7 +30,7 @@ engine::circle::circle(float radius) : m_radius(radius)
 	for (int i = 1; i < 30 + 2;++i) // Need to loop back over for the first triangle
 	{
 		circle_indices.push_back(0);
-		circle_indices.push_back(1+i);
+		circle_indices.push_back(i+1);
 		circle_indices.push_back(i);
 	}
 

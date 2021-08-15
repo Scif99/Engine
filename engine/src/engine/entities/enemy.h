@@ -12,7 +12,7 @@ public:
 
 	void on_update(float dt);
 	void on_render(const engine::ref<engine::shader>& shader);
-	void attack(float dt);
+	void attack(float dt); //Generalise to multiple states?
 
 	glm::vec3 position() const { return m_position; }
 
