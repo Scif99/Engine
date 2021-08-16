@@ -135,9 +135,11 @@
     <ClInclude Include="src\ballistic.h" />
     <ClInclude Include="src\blob.h" />
     <ClInclude Include="src\cross_fade.h" />
+    <ClInclude Include="src\door.h" />
     <ClInclude Include="src\example_layer.h" />
     <ClInclude Include="src\forcefield.h" />
     <ClInclude Include="src\house.h" />
+    <ClInclude Include="src\hud.h" />
     <ClInclude Include="src\pickup.h" />
     <ClInclude Include="src\pickup_container.h" />
     <ClInclude Include="src\player.h" />
@@ -148,10 +150,12 @@
     <ClCompile Include="src\blob.cpp" />
     <ClCompile Include="src\cross_fade.cpp" />
     <ClCompile Include="src\arrow.cpp" />
+    <ClCompile Include="src\door.cpp" />
     <ClCompile Include="src\example_layer.cpp" />
     <ClCompile Include="src\forcefield.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\house.cpp" />
+    <ClCompile Include="src\hud.cpp" />
     <ClCompile Include="src\pickup.cpp" />
     <ClCompile Include="src\pickup_container.cpp" />
     <ClCompile Include="src\player.cpp" />

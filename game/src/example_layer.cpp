@@ -85,14 +85,14 @@ example_layer::example_layer()
 
 
 
-	// Skybox texture from http://www.vwall.it/wp-content/plugins/canvasio3dpro/inc/resource/cubeMaps/
+	// Skybox texture from https://opengameart.org/content/interstellar-skybox
 	m_skybox = engine::skybox::create(50.f,
-		{ engine::texture_2d::create("assets/textures/skybox/SkyboxFront.bmp", true),
-		  engine::texture_2d::create("assets/textures/skybox/SkyboxRight.bmp", true),
-		  engine::texture_2d::create("assets/textures/skybox/SkyboxBack.bmp", true),
-		  engine::texture_2d::create("assets/textures/skybox/SkyboxLeft.bmp", true),
-		  engine::texture_2d::create("assets/textures/skybox/SkyboxTop.bmp", true),
-		  engine::texture_2d::create("assets/textures/skybox/SkyboxBottom.bmp", true)
+		{ engine::texture_2d::create("assets/textures/skybox/zpos.png", true),
+		  engine::texture_2d::create("assets/textures/skybox/xpos.png", true),
+		  engine::texture_2d::create("assets/textures/skybox/zneg.png", true),
+		  engine::texture_2d::create("assets/textures/skybox/xneg.png", true),
+		  engine::texture_2d::create("assets/textures/skybox/ypos.png", true),
+		  engine::texture_2d::create("assets/textures/skybox/yneg.png", true)
 		});
 
 	engine::ref<engine::skinned_mesh> m_skinned_mesh = engine::skinned_mesh::create("assets/models/animated/mannequin/free3Dmodel.dae");
@@ -100,6 +100,8 @@ example_layer::example_layer()
 	m_skinned_mesh->LoadAnimationFile("assets/models/animated/mannequin/idle.dae");
 	m_skinned_mesh->LoadAnimationFile("assets/models/animated/mannequin/jump.dae");
 	m_skinned_mesh->LoadAnimationFile("assets/models/animated/mannequin/standard_run.dae");
+	m_skinned_mesh->LoadAnimationFile("assets/models/animated/mannequin/right_strafe.dae");
+	m_skinned_mesh->LoadAnimationFile("assets/models/animated/mannequin/left_strafe.dae");
 	m_skinned_mesh->switch_root_movement(false);
 
 	engine::game_object_properties mannequin_props;
@@ -115,7 +117,7 @@ example_layer::example_layer()
 	// ENVIRONMENT
 
 	// Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
-	std::vector<engine::ref<engine::texture_2d>> terrain_textures = { engine::texture_2d::create("assets/textures/terrain.bmp", false) };
+	std::vector<engine::ref<engine::texture_2d>> terrain_textures = { engine::texture_2d::create("assets/textures/red.bmp", false) };
 	engine::ref<engine::terrain> terrain_shape = engine::terrain::create(100.f, 0.5f, 100.f);
 	engine::game_object_properties terrain_props;
 	terrain_props.meshes = { terrain_shape->mesh() };
@@ -132,7 +134,7 @@ example_layer::example_layer()
 	cow_props.meshes = cow_model->meshes();
 	cow_props.textures = cow_model->textures();
 	float cow_scale = 1.f / glm::max(cow_model->size().x, glm::max(cow_model->size().y, cow_model->size().z));
-	cow_props.position = { 0.5f,0.5f, 5.f };
+	cow_props.position = { 3.5f,0.5f, 4.f };
 	cow_props.scale = glm::vec3(cow_scale);
 	cow_props.bounding_shape = cow_model->size() / 2.f * cow_scale;
 	m_cow = engine::game_object::create(cow_props);
@@ -147,6 +149,19 @@ example_layer::example_layer()
 	jeep_props.scale = glm::vec3(jeep_scale);
 	jeep_props.bounding_shape = jeep_model->size() / 2.f * jeep_scale;
 	m_jeep = engine::game_object::create(jeep_props);
+
+	// Load the npc model. From https://opengameart.org/content/wandering-vendor-npc
+	engine::ref <engine::model> npc_model = engine::model::create("assets/models/static/wandering_trader.obj");
+	engine::ref<engine::texture_2d> npc_texture =
+		engine::texture_2d::create("assets/textures/text_corpoN.png", true);
+	engine::game_object_properties npc_props;
+	npc_props.meshes = npc_model->meshes();
+	npc_props.textures = { npc_texture };
+	float npc_scale = 0.5f;
+	npc_props.position = { 3.5f, 0.5f, 5.f };
+	npc_props.scale = glm::vec3(npc_scale);
+	npc_props.bounding_shape = npc_model->size() / 2.f * npc_scale;
+	m_npc = engine::game_object::create(npc_props);
 
 
 	// Load the tree model. Create a tree object. Set its properties
@@ -181,7 +196,6 @@ example_layer::example_layer()
 	blob_props.meshes = { m_blob.top()->mesh(), m_blob.bottom()->mesh() };
 	////Texture
 	blob_props.type = 1;
-	//arrow_props.bounding_shape = glm::vec3(0.5f);
 	blob_props.restitution = 0.92f;
 	blob_props.mass = 0.000001f;
 	//m_blob.initialise(engine::game_object::create(blob_props));// Is this right?
@@ -208,11 +222,19 @@ example_layer::example_layer()
 	circle_props.meshes = { circle_shape->mesh() };
 	m_circle = engine::game_object::create(circle_props);
 
+	// Platforms
+	engine::ref<engine::cone> platform_shape = engine::cone::create(2, 0.5, 6);
+	engine::game_object_properties platform_props;
+	platform_props.position = { 0.f,0.f,-10.f };
+	platform_props.meshes = { platform_shape->mesh() };
+	m_platform = engine::game_object::create(platform_props);
+
 
 	// House
 	m_house.initialise(2.f, 2.f, 5.f, 5.f);
 
-
+	//Door
+	m_door.initialise(3.0f, 2.f, 0.f, 0.f, 3.f, -25.f, 0.4f);
 
 
 	// Collectibles
@@ -283,6 +305,8 @@ example_layer::example_layer()
 	//Vector to store enemies
 	//m_enemies.push_back(m_blob);
 
+	// Vector to store available arrows;
+	//m_arrow_pouch.push_back();
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
 
 	// create  special FX
@@ -293,6 +317,9 @@ example_layer::example_layer()
 
 	m_text_manager = engine::text_manager::create();
 
+	// Create HUD
+	m_hud = hud::create("assets/textures/heart.png", 2.0f, 1.6f, 0.9f);
+
 	m_skinned_mesh->switch_animation(1);
 }
 
@@ -302,7 +329,9 @@ example_layer::~example_layer() {}
 // Update various components
 void example_layer::on_update(const engine::timestep& time_step)
 {
-
+	// Pause
+	if (m_hud->s_active)
+		return;
 
 
 	// Update all collectibles
@@ -314,10 +343,10 @@ void example_layer::on_update(const engine::timestep& time_step)
 	// TO-FIX! (use a timer)
 	if (!m_health->active())
 	{
-		m_player.set_health(m_player.health() + 50);
+
+		m_player.set_health(m_player.health() + 1);
 	}
 
-	m_pickup_container.on_update(time_step);
 
 	// Update physics
 	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
@@ -328,8 +357,9 @@ void example_layer::on_update(const engine::timestep& time_step)
 	// Update player & camera
 	m_player.on_update(time_step);
 	m_player.update_camera(m_3d_camera);
-	LOG_CORE_ERROR("player pos :  '{}'.", m_mannequin->position());
-	LOG_CORE_ERROR("circle pos :  '{}'.", m_circle->position());
+	LOG_CORE_ERROR("hp left :  '{}'.", m_hud->m_hearts_left);
+	
+
 
 
 	//Update enemies
@@ -340,6 +370,9 @@ void example_layer::on_update(const engine::timestep& time_step)
 	// Update FX
 	m_cross_fade->on_update(time_step);
 	m_forcefield->on_update(time_step);
+
+	// Update HUD
+	m_hud->on_update(time_step);
 }
 
 void example_layer::on_render() 
@@ -414,6 +447,12 @@ void example_layer::on_render()
 	jeep_transform = glm::scale(jeep_transform, m_jeep->scale());
 	engine::renderer::submit(textured_lighting_shader, jeep_transform, m_jeep);
 
+	//Render npc
+	glm::mat4 npc_transform(1.0f);
+	npc_transform = glm::translate(m_npc->position());
+	npc_transform = glm::rotate(npc_transform, -1.f * glm::pi<float>(), glm::vec3(0.f, 1.f, 0.f));
+	npc_transform = glm::scale(npc_transform, m_npc->scale());
+	engine::renderer::submit(textured_lighting_shader, npc_transform, m_npc);
 
 
 
@@ -492,9 +531,11 @@ void example_layer::on_render()
 	// Render the sphere using material shader
 	engine::renderer::submit(material_shader, m_ball);
 
+	//Render door
+	m_door.on_render(material_shader);
 
 	// Render ballistic using same shader as for sphere
-	//m_arrow.on_render(material_shader);
+	m_arrow.on_render(material_shader);
 	m_ballistic.on_render(material_shader);
 
 	m_blob.on_render(material_shader); //BLOB
@@ -510,12 +551,24 @@ void example_layer::on_render()
 	//Only render circles if weapon not picked up **Need to check if 2nd weapon is picked up too
 	if (m_bow->active())
 	{
-		glm::mat4 circle_transform(1.0f);
+		glm::mat4 circle_transform(1.f);
 		engine::renderer::submit(material_shader, m_circle);
 		circle_transform = glm::translate(circle_transform, glm::vec3(2.f, 0.6f, 2.f));
 		engine::renderer::submit(material_shader, circle_transform, m_circle);
 	}
 
+	std::stack<glm::mat4> platform_stack;
+
+	for (int i = 0;i < 3;++i)
+	{
+		platform_stack.push(glm::mat4(1.f));
+		platform_stack.top() = glm::translate(platform_stack.top(), m_platform->position() + glm::vec3(0.f, 1.f +float(i), -float(4*i)));
+		platform_stack.top() = glm::rotate(platform_stack.top(), glm::pi<float>(), glm::vec3(1.f, 0.f, 0.f));
+		
+		
+		engine::renderer::submit(material_shader, platform_stack.top(), m_platform);
+
+	}
 
 	
 
@@ -546,18 +599,29 @@ void example_layer::on_render()
 
 	//Render crosshairs?
 
-	std::pair<float, float> centre = std::make_pair( ((float)engine::application::window().width() - engine::application::window().width() / 2.f),
-													((float)engine::application::window().height() - (float)engine::application::window().height() / 2.f) ); // The centre of the window
-	m_text_manager->render_text(text_shader, "|" , centre.first +1.f, centre.second +15.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f)); //Top
-	m_text_manager->render_text(text_shader, "|", centre.first +1.f, centre.second -15.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f));
-	m_text_manager->render_text(text_shader, "_", centre.first -14.f , centre.second  +3.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f));
-	m_text_manager->render_text(text_shader, "_", centre.first +14.f, centre.second +3.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f));
+	std::pair<float, float> centre = std::make_pair(((float)engine::application::window().width() - engine::application::window().width() / 2.f),
+		((float)engine::application::window().height() - (float)engine::application::window().height() / 2.f)); // The centre of the window
+	m_text_manager->render_text(text_shader, "|", centre.first + 1.f, centre.second + 15.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f)); //Top
+	m_text_manager->render_text(text_shader, "|", centre.first + 1.f, centre.second - 15.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f));
+	m_text_manager->render_text(text_shader, "_", centre.first - 14.f, centre.second + 3.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f));
+	m_text_manager->render_text(text_shader, "_", centre.first + 14.f, centre.second + 3.f, 0.2f, glm::vec4(1.f, 1.f, 1.f, 1.f));
 
+
+	// Render Game Over text
+	if (m_hud->m_hearts_left == 0)
+	{
+		m_text_manager->render_text(text_shader,  "GAME OVER! ",
+			(float)engine::application::window().height() / 3.f, (float)engine::application::window().height() / 2.f, 2.5f, glm::vec4(0.f, 0.f, 0.f, 1.f));
+	}
 
 	//Render 2D
 
 	engine::renderer::begin_scene(m_2d_camera, textured_lighting_shader);
 	m_cross_fade->on_render(textured_lighting_shader);
+
+	//Render HUD
+	m_hud->on_render(textured_lighting_shader);
+	
 
 } 
 
@@ -585,9 +649,17 @@ void example_layer::on_event(engine::event& event)
 			//m_3d_camera->shake();
 		}
 
+
+		// **TO-DO Change to when player gets hit
+		if (e.key_code() == engine::key_codes::KEY_P)
+		{
+			m_hud->toggle();
+			//m_3d_camera->shake();
+		}
+
 		if (e.key_code() == engine::key_codes::KEY_2)
 		{
-
+			m_hud->m_hearts_left -= 1;
 			//m_3d_camera->shake();
 		}
 
@@ -623,9 +695,10 @@ void example_layer::on_event(engine::event& event)
 	if (event.event_type() == engine::event_type_e::mouse_button_pressed)
 	{
 		auto& e = dynamic_cast<engine::mouse_button_pressed_event&>(event);
-		if (e.mouse_button() == engine::mouse_button_codes::MOUSE_BUTTON_LEFT) //Left click
+		if (e.mouse_button() == engine::mouse_button_codes::MOUSE_BUTTON_LEFT)// && m_arrow_pouch.size() > 0) //Left click
 		{
 			m_ballistic.fire(m_mannequin, 25.0f); // Fire from player's position
+			//m_arrow_pouch.pop_back();
 		}
 
 	}

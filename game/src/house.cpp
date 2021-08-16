@@ -34,7 +34,6 @@ void house::initialise(float height, float width, float x_pos, float z_pos)
 	base_transform = glm::translate(overall_transform, glm::vec3(0.f, 0.f, 0.f));
 
 	roof_transform = glm::translate(overall_transform, glm::vec3(0.f, m_height / 2.f, 0.f));
-	//roof_transform = glm::rotate(overall_transform, glm::pi<float>(), glm::vec3(1.f,0.f,0.f));
 	chimney_transform = glm::translate(overall_transform, glm::vec3(m_width / 3.f, m_height / 2.f + 0.3f, m_width / 3.f));
 
 	

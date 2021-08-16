@@ -9,6 +9,9 @@
 #include "house.h"
 #include "blob.h"
 #include "pickup_container.h"
+#include "hud.h"
+#include "door.h"
+
 
 
 
@@ -37,6 +40,9 @@ private:
 	engine::ref<engine::game_object>	m_ball{};
 	engine::ref<engine::game_object>	m_mannequin{};
 	engine::ref<engine::game_object>	m_jeep{};
+	engine::ref<engine::game_object>	m_platform{}; //
+	engine::ref<engine::game_object>	m_npc{}; //
+
 
 
 
@@ -46,6 +52,7 @@ private:
 
 
 	house m_house;
+	door m_door;
 
 
 
@@ -81,7 +88,7 @@ private:
 	std::vector<engine::ref<engine::game_object>>   m_game_objects{};
 	std::vector<engine::ref<pickup>>	m_collectibles{};
 	std::vector<engine::ref<engine::game_object>>	m_enemies{};
-
+	std::vector<engine::ref<ballistic>>	m_arrow_pouch{};
 
 	engine::ref<engine::bullet_manager> m_physics_manager{};
 	engine::ref<engine::audio_manager>  m_audio_manager{};
@@ -90,6 +97,8 @@ private:
 
     engine::orthographic_camera       m_2d_camera; 
     engine::perspective_camera        m_3d_camera;
+
+	engine::ref<hud>				m_hud{};
 
 	// Special FX
 	engine::ref<cross_fade>							m_cross_fade{};

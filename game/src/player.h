@@ -20,17 +20,22 @@ public:
 	void update_camera(engine::perspective_camera& camera);
 	void jump();
 	bool is_fps() { return fps; }
-	void toggle_fps() { fps =  !fps; } //Toggle fps camera
-	bool sprint = false;
-	std::string sprint_notif() { return (sprint) ? "On" : "Off"; } // Part of the HUD
+	void toggle_fps() { fps =  !fps; } //Toggle fps 
 	void set_health(int h) { m_health = h; }
 	int health() { return m_health; }
+
+
+
+	bool m_walking;
+	bool m_sprinting;
+	bool m_idle;
 
 private:
 	float m_speed{ 0.f };
 	float m_timer;
 	bool fps = true; // Boolean to determins whether camera is in fps mode
 	int m_health = 100;
+
 
 	engine::ref< engine::game_object> m_object;
 };

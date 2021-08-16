@@ -1,0 +1,46 @@
+# Blender MTL File: 'wandering_trader.blend'
+# Material Count: 4
+
+newmtl Material
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl Material.004
+Ns 545.098039
+Ka 1.000000 1.000000 1.000000
+Kd 0.049050 0.048024 0.048024
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd C:\Users\Soleh\AppData\Local\Temp\Temp1_trader_blender.zip\trader\vestiti-capelliV.png
+map_Bump -bm -1.981481 C:\\Users\\Soleh\\AppData\\Local\\Temp\\Temp1_trader_blender.zip\\trader\\vestiti-capelliV.png
+
+newmtl suite1
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.188279 0.117321 0.207472
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd C:\Users\Soleh\AppData\Local\Temp\Temp1_trader_blender.zip\trader\vestiti-capelliV.png
+
+newmtl testa.001
+Ns 17.647059
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 0.000000 0.000000
+Ks 0.005000 0.005000 0.005000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:\Users\Soleh\AppData\Local\Temp\Temp1_trader_blender.zip\trader\text_corpoV.png
