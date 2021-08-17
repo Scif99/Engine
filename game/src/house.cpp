@@ -8,7 +8,7 @@ house::house()
 house::~house()
 {}
 
-void house::initialise(float height, float width, float x_pos, float z_pos)
+void house::initialise(float height, float width, float x_pos, float z_pos, int cone_triangles)
 {
 	m_height = height;
 	m_width = width;
@@ -18,7 +18,7 @@ void house::initialise(float height, float width, float x_pos, float z_pos)
 	m_chimney = engine::cuboid::create(glm::vec3(0.07f, 0.3f, 0.07f), false);
 
 	float hyp = std::sqrt(2.f) * width;
-	m_roof = engine::cone::create(hyp, width / 4.f, 20);
+	m_roof = engine::cone::create(hyp, width / 4.f, cone_triangles);
 
 
 	m_material = engine::material::create(0.5f, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f), 1.0f);

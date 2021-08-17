@@ -1380,6 +1380,9 @@
     <ClInclude Include="src\engine\entities\shapes\cone.h">
       <Filter>src\engine\entities\shapes</Filter>
     </ClInclude>
+    <ClInclude Include="src\engine\entities\particle.h">
+      <Filter>src\engine\entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\engine\core\application.cpp">
@@ -1522,6 +1525,9 @@
     </ClCompile>
     <ClCompile Include="src\engine\entities\shapes\cone.cpp">
       <Filter>src\engine\entities\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\entities\particle.cpp">
+      <Filter>src\engine\entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

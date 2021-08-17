@@ -6,7 +6,7 @@ class house
 public:
 	house();
 	~house();
-	void initialise(float height, float width, float x_pos, float z_pos);
+	void initialise(float height, float width, float x_pos, float z_pos, int cone_triangles);
 
 	void on_render(const engine::ref<engine::shader>& shader);
 

@@ -144,6 +144,7 @@
     <ClInclude Include="src\pickup_container.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\quad.h" />
+    <ClInclude Include="src\smoke_trail.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ballistic.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="src\pickup_container.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\quad.cpp" />
+    <ClCompile Include="src\smoke_trail.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\engine\engine.vcxproj">

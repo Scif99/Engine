@@ -38,6 +38,8 @@
 #include "engine/entities/skybox.h"
 #include "engine/entities/shapes/tetrahedron.h"
 #include "engine/entities/shapes/circle.h"
+#include "engine/entities/particle.h"
+
 
 
 

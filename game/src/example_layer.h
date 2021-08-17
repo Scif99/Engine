@@ -11,6 +11,7 @@
 #include "pickup_container.h"
 #include "hud.h"
 #include "door.h"
+#include "smoke_trail.h"
 
 
 
@@ -52,6 +53,7 @@ private:
 
 
 	house m_house;
+	house m_mountain;
 	door m_door;
 
 
@@ -65,6 +67,8 @@ private:
 	arrow m_arrow;
 	ballistic m_ballistic;
 	pickup_container m_pickup_container;
+
+
 	// Collectibles
 	engine::ref<pickup> m_health;
 	engine::ref<pickup> m_random;
@@ -103,6 +107,9 @@ private:
 	// Special FX
 	engine::ref<cross_fade>							m_cross_fade{};
 	engine::ref<alpha_sphere>						m_forcefield{};
+	smoke_trail										m_smoke_trail;
+
+
 	//Variable to track game score
 	int m_score{ 0 };
 };

@@ -153,7 +153,7 @@ example_layer::example_layer()
 	// Load the npc model. From https://opengameart.org/content/wandering-vendor-npc
 	engine::ref <engine::model> npc_model = engine::model::create("assets/models/static/wandering_trader.obj");
 	engine::ref<engine::texture_2d> npc_texture =
-		engine::texture_2d::create("assets/textures/text_corpoN.png", true);
+		engine::texture_2d::create("assets/textures/text_corpoV.png", true);
 	engine::game_object_properties npc_props;
 	npc_props.meshes = npc_model->meshes();
 	npc_props.textures = { npc_texture };
@@ -231,7 +231,9 @@ example_layer::example_layer()
 
 
 	// House
-	m_house.initialise(2.f, 2.f, 5.f, 5.f);
+	m_house.initialise(2.f, 2.f, 5.f, 5.f, 20);
+	m_mountain.initialise(10.f, 4.f, 20.f, 0.f, 4);
+
 
 	//Door
 	m_door.initialise(3.0f, 2.f, 0.f, 0.f, 3.f, -25.f, 0.4f);
@@ -310,10 +312,9 @@ example_layer::example_layer()
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
 
 	// create  special FX
-
-	m_cross_fade = cross_fade::create("assets/textures/Red.bmp", 2.0f, 1.6f, 0.9f);
-
+	m_cross_fade = cross_fade::create("assets/textures/red.bmp", 2.0f, 1.6f, 0.9f);
 	m_forcefield = alpha_sphere::create(glm::vec3(1.f, 0.f, 1.0f), glm::vec3(0.f, 0.f, 1.f), true, 0.25f, 2.0f);
+	m_smoke_trail.load_texture("assets/textures/grey_smoke.tga");
 
 	m_text_manager = engine::text_manager::create();
 
@@ -370,6 +371,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 	// Update FX
 	m_cross_fade->on_update(time_step);
 	m_forcefield->on_update(time_step);
+	m_smoke_trail.on_update(time_step);
 
 	// Update HUD
 	m_hud->on_update(time_step);
@@ -510,8 +512,8 @@ void example_layer::on_render()
 			q_pickup_transform);
 	}
 
-
-
+	// Smoke
+	m_smoke_trail.on_render(m_3d_camera, textured_lighting_shader);
 
     engine::renderer::end_scene();
 
@@ -523,6 +525,9 @@ void example_layer::on_render()
 
 	// Render House
 	m_house.on_render(material_shader);
+
+
+	m_mountain.on_render(material_shader);
 
 	m_material->submit(material_shader); //Pass sphere material to renderer
 
@@ -545,6 +550,7 @@ void example_layer::on_render()
 	
 	// Render forcefield
 	m_forcefield->on_render(material_shader);
+
 
 	m_material->submit(material_shader); //Pass tetrahedron material to renderer
 
@@ -612,6 +618,9 @@ void example_layer::on_render()
 	{
 		m_text_manager->render_text(text_shader,  "GAME OVER! ",
 			(float)engine::application::window().height() / 3.f, (float)engine::application::window().height() / 2.f, 2.5f, glm::vec4(0.f, 0.f, 0.f, 1.f));
+
+		m_text_manager->render_text(text_shader, "Press escape to exit... ",
+			(float)engine::application::window().height() / 3.f, (float)engine::application::window().height() / 3.f, 1.5f, glm::vec4(0.f, 0.f, 0.f, 1.f));
 	}
 
 	//Render 2D
@@ -663,6 +672,10 @@ void example_layer::on_event(engine::event& event)
 			//m_3d_camera->shake();
 		}
 
+		if (e.key_code() == engine::key_codes::KEY_G)
+		{
+			m_smoke_trail.initialise(m_mannequin->position() + glm::vec3(0.f,1.f,0.f), -m_mannequin->forward(), 5, 0.25f, 0.25f); //TIMER
+		}
 
 
 		// If player tries to move into forcefield before defeating all the enemies
